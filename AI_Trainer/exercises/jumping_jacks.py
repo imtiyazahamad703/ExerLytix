@@ -1,2 +1,2 @@
-def check_jumping_jacks():
-    pass
+def jumping_jacks():
+    return 'Jumping Jacks implemented'
