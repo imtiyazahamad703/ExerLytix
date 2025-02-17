@@ -12,15 +12,35 @@ cap.set(4, 480)  # height
 
 print("Press 'q' to quit.")
 
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
+# Setup mediapipe pose instance
+with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+            
+        # Convert frame to RGB for MediaPipe
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame_rgb.flags.writeable = False
         
-    cv2.imshow('ExerLytix Video Feed', frame)
-    
-    if cv2.waitKey(10) & 0xFF == ord('q'):
-        break
+        # Process the frame and detect pose
+        results = pose.process(frame_rgb)
+        
+        # Convert back to BGR for OpenCV
+        frame_rgb.flags.writeable = True
+        frame = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
+        
+        # Extract landmarks if pose is detected
+        try:
+            landmarks = results.pose_landmarks.landmark
+            # print("Landmarks detected!")
+        except:
+            pass
+            
+        cv2.imshow('ExerLytix Video Feed', frame)
+        
+        if cv2.waitKey(10) & 0xFF == ord('q'):
+            break
 
 cap.release()
 cv2.destroyAllWindows()
