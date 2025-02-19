@@ -15,3 +15,15 @@ class BodyPartAngle:
         r_elbow = get_landmark_coords(self.landmarks, "RIGHT_ELBOW")
         r_wrist = get_landmark_coords(self.landmarks, "RIGHT_WRIST")
         return calculate_angle(r_shoulder, r_elbow, r_wrist)
+
+    def angle_of_the_left_leg(self):
+        l_hip = get_landmark_coords(self.landmarks, "LEFT_HIP")
+        l_knee = get_landmark_coords(self.landmarks, "LEFT_KNEE")
+        l_ankle = get_landmark_coords(self.landmarks, "LEFT_ANKLE")
+        return calculate_angle(l_hip, l_knee, l_ankle)
+
+    def angle_of_the_right_leg(self):
+        r_hip = get_landmark_coords(self.landmarks, "RIGHT_HIP")
+        r_knee = get_landmark_coords(self.landmarks, "RIGHT_KNEE")
+        r_ankle = get_landmark_coords(self.landmarks, "RIGHT_ANKLE")
+        return calculate_angle(r_hip, r_knee, r_ankle)
