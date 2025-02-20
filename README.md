@@ -9,3 +9,41 @@ An AI-powered fitness platform providing personalized workout & diet recommendat
 ![image](https://github.com/user-attachments/assets/477d9eae-31ab-4683-be5d-c6f5dd9862e1)
 ![image](https://github.com/user-attachments/assets/f1eb88be-7aee-45ee-9558-e4d1d2912b5b)
 
+# Project Setupt
+  ## Clone project : 
+      using git clone 'url'
+  ## Frontend
+  File -> open folder -> open till frontend
+  **on vs code terminal :** 
+  npm install
+  npm install react react-dom react-router-dom
+  npm install react-router-dom
+  npm install recharts
+
+  npm install -D tailwindcss postcss autoprefixer
+  npm install axios
+  npm install react-hook-form
+  npm install react-icons
+
+  ## Backend
+    jdk -21
+    mysql db
+   **Eclipse** : 
+      file -> import -> import Existing maven project -> select till backend folder.
+    Update Maven project :
+      right click project -> maven -> update project -> select all -> ok 
+    
+  ### application.properties
+    change username 
+    change password
+    create db : 
+      copy & past : create database exerlytix;
+
+# How to run Project :
+  **1st** run backend : ExerLytixApplication.java (inside :com.immutech.ExerLytix;) as application
+  **2nd** frontend terminal : npm run dev
+  
+ 
+    
+      
+      
