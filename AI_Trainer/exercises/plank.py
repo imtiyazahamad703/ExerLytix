@@ -1,2 +1,2 @@
-def check_plank():
-    pass
+def plank():
+    return 'Plank implemented'
