@@ -10,11 +10,11 @@ class TypeOfExercise(BodyPartAngle):
         avg_arm_angle = (left_arm_angle + right_arm_angle) / 2
 
         if status:
-            if avg_arm_angle < 30:
+            if avg_arm_angle < 45:
                 counter += 1
                 status = False
         else:
-            if avg_arm_angle > 160:
+            if avg_arm_angle > 150:
                 status = True
 
         return [counter, status]
