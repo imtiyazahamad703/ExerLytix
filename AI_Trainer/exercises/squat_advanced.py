@@ -1,2 +1,2 @@
 def advanced_squat():
-    pass
+    return 'Advanced squat depth check'
