@@ -34,10 +34,27 @@ class TypeOfExercise(BodyPartAngle):
 
         return [counter, status]
 
+    def squat(self, counter, status):
+        left_leg_angle = self.angle_of_the_left_leg()
+        right_leg_angle = self.angle_of_the_right_leg()
+        avg_leg_angle = (left_leg_angle + right_leg_angle) / 2
+
+        if status:
+            if avg_leg_angle < 70:
+                counter += 1
+                status = False
+        else:
+            if avg_leg_angle > 160:
+                status = True
+
+        return [counter, status]
+
     def calculate_exercise(self, exercise_type, counter, status):
         if exercise_type == "bicep-curl":
             counter, status = self.bicep_curl(counter, status)
         elif exercise_type == "push-up":
             counter, status = self.push_up(counter, status)
+        elif exercise_type == "squat":
+            counter, status = self.squat(counter, status)
 
         return [counter, status]
