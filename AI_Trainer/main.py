@@ -12,8 +12,14 @@ cap.set(4, 480)  # height
 
 print("Press 'q' to quit.")
 
+from types_of_exercise import TypeOfExercise
+
 # Setup mediapipe pose instance
 with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+    counter = 0
+    status = True
+    exercise_type = "bicep-curl"  # Default exercise for testing
+    
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
@@ -33,7 +39,12 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
         # Extract landmarks if pose is detected
         try:
             landmarks = results.pose_landmarks.landmark
-            # print("Landmarks detected!")
+            counter, status = TypeOfExercise(landmarks).calculate_exercise(
+                exercise_type, counter, status
+            )
+            # Add simple text overlay for testing
+            cv2.putText(frame, f"Exercise: {exercise_type}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.putText(frame, f"Count: {counter}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
         except:
             pass
             
