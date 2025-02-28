@@ -12,13 +12,19 @@ cap.set(4, 480)  # height
 
 print("Press 'q' to quit.")
 
+import argparse
 from types_of_exercise import TypeOfExercise
+
+# Setup argparse
+ap = argparse.ArgumentParser()
+ap.add_argument("-t", "--exercise_type", type=str, help='Type of activity to do', default="bicep-curl")
+args = vars(ap.parse_args())
 
 # Setup mediapipe pose instance
 with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
     counter = 0
     status = True
-    exercise_type = "bicep-curl"  # Default exercise for testing
+    exercise_type = args["exercise_type"]
     
     while cap.isOpened():
         ret, frame = cap.read()
