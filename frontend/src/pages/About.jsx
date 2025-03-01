@@ -1,0 +1,1 @@
+export const About = () => <div><h1>About ExerLytix</h1><p>AI Personal Trainer</p></div>;
