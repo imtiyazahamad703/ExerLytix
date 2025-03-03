@@ -1,0 +1,1 @@
+export const Nutrition = () => <div><h1>Nutrition Guide</h1><p>Eat healthy.</p></div>;
