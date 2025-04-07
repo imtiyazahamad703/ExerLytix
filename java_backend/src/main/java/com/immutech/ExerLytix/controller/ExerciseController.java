@@ -5,6 +5,7 @@ import com.immutech.ExerLytix.entity.*;
 import com.immutech.ExerLytix.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -19,6 +20,9 @@ public class ExerciseController {
 
     @Autowired
     private MemberRepository userRepo;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     // 🧩 API endpoint to update exercise
     @PostMapping("/exercise/update")
@@ -80,6 +84,9 @@ public class ExerciseController {
             System.out.println("total_reps: "+count);
             System.out.println("duration: "+duration);
             System.out.println("calories_burned: "+calories);
+
+            // Broadcast real-time update to connected clients via WebSocket
+            messagingTemplate.convertAndSend("/topic/exercise-updates", updatedLog);
 
             return ResponseEntity.ok(updatedLog);
         } catch (Exception e) {

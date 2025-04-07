@@ -85,7 +85,8 @@ def stop_python():
 
                 import requests
                 try:
-                    requests.post("https://exerlytix-backend1.onrender.com/api/exercise/update", json=payload, timeout=5)
+                    backend_url = os.environ.get("JAVA_BACKEND_URL", "http://localhost:8081")
+                    requests.post(f"{backend_url}/api/exercise/update", json=payload, timeout=5)
                     print("✅ Data sent successfully to backend!")
                 except Exception as e:
                     print(f"❌ Backend update failed: {e}")
@@ -112,4 +113,5 @@ def get_exercise_count():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
