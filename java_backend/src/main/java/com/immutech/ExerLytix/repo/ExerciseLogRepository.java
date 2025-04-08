@@ -11,4 +11,7 @@ import java.util.Optional;
 public interface ExerciseLogRepository extends JpaRepository<ExerciseLog, Long> {
     Optional<ExerciseLog> findByUserAndDate(Member user, LocalDate date);
     boolean existsByUserAndDate(Member user, LocalDate date);
+    
+    // Fetch all logs for a user, sorted by date (newest first)
+    java.util.List<ExerciseLog> findAllByUserOrderByDateDesc(Member user);
 }

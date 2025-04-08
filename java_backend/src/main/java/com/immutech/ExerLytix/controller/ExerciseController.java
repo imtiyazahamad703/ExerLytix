@@ -109,6 +109,20 @@ public class ExerciseController {
         }
     }
 
+    // 🧩 API endpoint to get complete workout history for a user
+    @GetMapping("/exercise/history/{userId}")
+    public ResponseEntity<?> getExerciseHistory(@PathVariable Integer userId) {
+        try {
+            Member user = userRepo.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            
+            java.util.List<ExerciseLog> history = logRepo.findAllByUserOrderByDateDesc(user);
+            return ResponseEntity.ok(history);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 
     private float calculateCalories(String exercise, int count) {
         switch (exercise) {
