@@ -2,16 +2,19 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import { useAuth } from "../context/AuthContext";
 
-const WorkoutHistoryTable = () => {
+const WorkoutHistoryTable = ({ workoutsData = null }) => {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { profile } = useAuth();
 
   useEffect(() => {
-    if (profile?.userId) {
+    if (workoutsData) {
+      setWorkouts(workoutsData);
+      setLoading(false);
+    } else if (profile?.userId) {
       fetchHistory();
     }
-  }, [profile]);
+  }, [profile, workoutsData]);
 
   const fetchHistory = async () => {
     try {

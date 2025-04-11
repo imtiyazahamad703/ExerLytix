@@ -23,8 +23,8 @@ ChartJS.register(
 
 const LineChart = ({ data, title }) => {
   return (
-    <div className="bg-white shadow-lg rounded-xl p-6 hover:scale-105 transition transform">
-      <h3 className="text-lg font-bold text-gray-700 mb-2">{title}</h3>
+    <div className="w-full h-full">
+      <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">{title}</h3>
       <Line data={data} options={{ responsive: true, plugins: { legend: { display: false } } }} />
     </div>
   );

@@ -6,9 +6,11 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const DoughnutChart = ({ data, title }) => {
   return (
-    <div className="bg-white shadow-lg rounded-xl p-6 hover:scale-105 transition transform">
-      <h3 className="text-lg font-bold text-gray-700 mb-2">{title}</h3>
-      <Doughnut data={data} options={{ responsive: true, plugins: { legend: { position: "bottom" } } }} />
+    <div className="w-full h-full flex flex-col items-center">
+      <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 w-full text-left">{title}</h3>
+      <div className="w-full max-w-[250px]">
+        <Doughnut data={data} options={{ responsive: true, plugins: { legend: { position: "bottom", labels: { color: "#94a3b8" } } } }} />
+      </div>
     </div>
   );
 };
