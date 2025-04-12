@@ -41,21 +41,34 @@ def detection_body_parts(landmarks):
     return body_parts
 
 
-def score_table(exercise, frame , counter, status):
-    cv2.putText(frame, "Activity : " + exercise.replace("-", " "),
-                (10, 65), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2,
-                cv2.LINE_AA)
-    cv2.putText(frame, "Counter : " + str(counter), (10, 100),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2, cv2.LINE_AA)
-    cv2.putText(frame, "Status : " + str(status), (10, 135),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2, cv2.LINE_AA)
-
-    # try:
-    #     with open("exercise_counter.txt", "w") as f:
-    #         f.write(f"{counter}\n")
-    #     print(f"Written to file: {exercise} reps: {counter}")
-    # except Exception as e:
-    #     print(f"Error writing to file: {e}")
+def score_table(exercise, frame, counter, status):
+    # Colors (BGR format in OpenCV)
+    BRAND_PURPLE = (204, 0, 176)   # #b000cc approx for OpenCV BGR
+    WHITE = (255, 255, 255)
+    BLACK = (0, 0, 0)
+    
+    # Draw top banner background
+    cv2.rectangle(frame, (0, 0), (frame.shape[1], 80), BRAND_PURPLE, -1)
+    
+    # Put text for Exercise Name
+    cv2.putText(frame, f"ACTIVITY: {exercise.replace('-', ' ').upper()}", 
+                (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, WHITE, 3, cv2.LINE_AA)
+                
+    # Draw left side stats box
+    cv2.rectangle(frame, (10, 100), (250, 250), (255, 255, 255), -1)
+    cv2.rectangle(frame, (10, 100), (250, 250), BRAND_PURPLE, 2)
+    
+    # Put Stats Text
+    cv2.putText(frame, "REPS", (30, 140), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, BLACK, 2, cv2.LINE_AA)
+    cv2.putText(frame, str(counter), (30, 190), 
+                cv2.FONT_HERSHEY_SIMPLEX, 1.5, BRAND_PURPLE, 4, cv2.LINE_AA)
+                
+    cv2.putText(frame, "STATUS:", (30, 230), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, BLACK, 1, cv2.LINE_AA)
+    
+    status_color = (0, 200, 0) if str(status).lower() == 'true' else (0, 0, 255)
+    cv2.putText(frame, str(status).upper(), (110, 230), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, status_color, 2, cv2.LINE_AA)
 
     return frame
-

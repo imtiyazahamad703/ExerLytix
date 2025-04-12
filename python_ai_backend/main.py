@@ -24,8 +24,8 @@ user_id = args["user_id"]
 backend_url = "https://exerlytix-backend1.onrender.com/api/exercise"
 cap = cv2.VideoCapture("Exercise Videos/" + args["video_source"]) if args["video_source"] else cv2.VideoCapture(0)
 
-cap.set(3, 800)
-cap.set(4, 480)
+cap.set(3, 1280)
+cap.set(4, 720)
 
 counter = 0
 status = True
@@ -63,7 +63,7 @@ with mp_pose.Pose(min_detection_confidence=0.5,
         if not ret:
             break
 
-        frame = cv2.resize(frame, (800, 480))
+        frame = cv2.resize(frame, (1280, 720))
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame.flags.writeable = False
         results = pose.process(frame)

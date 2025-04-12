@@ -4,58 +4,67 @@ import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="bg-slate-950 text-slate-400 py-12 border-t border-slate-800/50">
-      <div className="container mx-auto px-6 lg:px-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-          {/* Logo & Description */}
-          <div>
-            <Link to="/" className="text-3xl font-extrabold tracking-tight">
-              <span className="gradient-text">Exer</span>
-              <span className="text-white">Lytix</span>
-            </Link>
-            <p className="mt-4 text-sm leading-relaxed">
+    <footer className="w-full bg-white dark:bg-[#0a0a0f] border-t border-gray-200 dark:border-slate-800 pt-16 pb-8 transition-colors duration-300">
+      <div className="container mx-auto px-6 lg:px-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        
+        {/* Brand */}
+        <div>
+          <h2 className="text-2xl font-extrabold tracking-wider text-gray-900 dark:text-white flex items-center gap-2 mb-4 transition-colors">
+            Exer<span className="brand-text">Lytix</span>
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed transition-colors">
               Transform your fitness journey with next-gen AI-powered computer vision and real-time tracking.
             </p>
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Quick Links</h3>
-            <ul className="space-y-3 text-sm">
-              <li><Link to="/" className="hover:text-neon-blue transition-colors">Home</Link></li>
-              <li><Link to="/about" className="hover:text-neon-blue transition-colors">About</Link></li>
-              <li><Link to="/dashboard" className="hover:text-neon-blue transition-colors">Workouts</Link></li>
-              <li><Link to="/nutrition" className="hover:text-neon-blue transition-colors">Nutrition</Link></li>
-            </ul>
-          </div>
-
-          {/* Support */}
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Support</h3>
-            <ul className="space-y-3 text-sm">
-              <li><Link to="#" className="hover:text-neon-blue transition-colors">Help Center</Link></li>
-              <li><Link to="#" className="hover:text-neon-blue transition-colors">Privacy Policy</Link></li>
-              <li><Link to="#" className="hover:text-neon-blue transition-colors">Terms of Service</Link></li>
-            </ul>
-          </div>
-
-          {/* Social Media */}
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Follow Us</h3>
-            <div className="flex space-x-4">
-              <a href="#" className="p-2 bg-slate-800 rounded-full hover:bg-neon-blue hover:text-black transition-all duration-300"><FaFacebookF size={18} /></a>
-              <a href="#" className="p-2 bg-slate-800 rounded-full hover:bg-neon-blue hover:text-black transition-all duration-300"><FaTwitter size={18} /></a>
-              <a href="#" className="p-2 bg-slate-800 rounded-full hover:bg-neon-blue hover:text-black transition-all duration-300"><FaInstagram size={18} /></a>
-              <a href="#" className="p-2 bg-slate-800 rounded-full hover:bg-neon-blue hover:text-black transition-all duration-300"><FaLinkedinIn size={18} /></a>
-            </div>
-          </div>
+        <div>
+          <h3 className="text-gray-900 dark:text-white font-semibold mb-4 transition-colors">Quick Links</h3>
+          <ul className="space-y-3">
+            <li><Link to="/" className="text-sm text-gray-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-neon-blue transition-colors">Home</Link></li>
+            <li><Link to="/about" className="text-sm text-gray-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-neon-blue transition-colors">About</Link></li>
+            <li><Link to="/workouts" className="text-sm text-gray-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-neon-blue transition-colors">Workouts</Link></li>
+            <li><Link to="/nutrition" className="text-sm text-gray-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-neon-blue transition-colors">Nutrition</Link></li>
+          </ul>
         </div>
 
-        {/* Bottom Section */}
-        <div className="mt-12 border-t border-slate-800 pt-6 flex flex-col md:flex-row items-center justify-between text-sm">
-          <p>© 2025 ExerLytix. All rights reserved.</p>
-          <p className="mt-2 md:mt-0 text-slate-500">Built with precision for peak performance.</p>
+        {/* Support */}
+        <div>
+          <h3 className="text-gray-900 dark:text-white font-semibold mb-4 transition-colors">Support</h3>
+          <ul className="space-y-3">
+            <li><Link to="/help" className="text-sm text-gray-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-neon-blue transition-colors">Help Center</Link></li>
+            <li><Link to="/privacy" className="text-sm text-gray-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-neon-blue transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/terms" className="text-sm text-gray-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-neon-blue transition-colors">Terms of Service</Link></li>
+          </ul>
         </div>
+
+          {/* Social */}
+        <div>
+          <h3 className="text-gray-900 dark:text-white font-semibold mb-4 transition-colors">Follow Us</h3>
+          <div className="flex space-x-4">
+            <a href="#" className="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-slate-400 hover:bg-blue-600 hover:text-white dark:hover:bg-neon-blue dark:hover:text-slate-900 transition-all">
+              <FaFacebookF size={14} />
+            </a>
+            <a href="#" className="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-slate-400 hover:bg-blue-400 hover:text-white dark:hover:bg-neon-blue dark:hover:text-slate-900 transition-all">
+              <FaTwitter size={14} />
+            </a>
+            <a href="#" className="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-slate-400 hover:bg-pink-600 hover:text-white dark:hover:bg-neon-purple dark:hover:text-slate-900 transition-all">
+              <FaInstagram size={14} />
+            </a>
+            <a href="#" className="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-slate-400 hover:bg-blue-700 hover:text-white dark:hover:bg-neon-blue dark:hover:text-slate-900 transition-all">
+              <FaLinkedinIn size={14} />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-6 lg:px-16 mt-12 pt-8 border-t border-gray-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center transition-colors">
+        <p className="text-xs text-gray-500 dark:text-slate-500 mb-4 md:mb-0 transition-colors">
+          &copy; {new Date().getFullYear()} ExerLytix. All rights reserved.
+        </p>
+        <p className="text-xs text-gray-500 dark:text-slate-500 transition-colors">
+          Built with precision for peak performance.
+        </p>
       </div>
     </footer>
   );

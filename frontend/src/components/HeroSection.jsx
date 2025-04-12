@@ -1,64 +1,75 @@
 import React from "react";
-import fitnessImage from "../assets/banners/image.png";
 import { Link } from "react-router-dom";
+import bannerImage from "../assets/banners/banner1.png";
 
 const HeroSection = () => {
   return (
-    <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-slate-900 pt-20">
-      {/* Background glowing orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-neon-blue/20 rounded-full blur-[100px]"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-neon-purple/20 rounded-full blur-[100px]"></div>
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-slate-900 pt-20 transition-colors duration-300">
+      
+      {/* Subtle Background Pattern */}
+      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] dark:opacity-10 mix-blend-overlay transition-opacity"></div>
+      </div>
 
-      <div className="container mx-auto px-6 lg:px-16 flex flex-col md:flex-row items-center justify-between relative z-10">
-        
-        {/* Left Section - Text */}
-        <div className="max-w-2xl text-center md:text-left">
-          <div className="inline-block px-4 py-1.5 mb-6 rounded-full border border-neon-blue/30 bg-neon-blue/10 backdrop-blur-sm text-neon-blue text-sm font-semibold tracking-wider">
-            AI-POWERED FITNESS TRACKING
-          </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-white mb-6">
-            Transform Your Body With <span className="gradient-text text-glow">ExerLytix</span>
-          </h1>
-          <p className="text-lg md:text-xl text-slate-300 mb-10 max-w-xl mx-auto md:mx-0 leading-relaxed">
-            Experience the future of fitness. Real-time form correction, automated rep counting, and intelligent analytics powered by advanced computer vision.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 justify-center md:justify-start">
-            <Link to="/auth/login">
-              <button className="px-8 py-4 bg-gradient-to-r from-neon-blue to-primary-dark rounded-full text-white font-bold text-lg shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:shadow-[0_0_30px_rgba(0,240,255,0.6)] hover:scale-105 transition-all duration-300">
-                Start Free Trial
-              </button>
-            </Link>
-            <Link to="/about">
-              <button className="px-8 py-4 rounded-full bg-slate-800/50 backdrop-blur-md border border-slate-700 text-white font-semibold text-lg hover:bg-slate-700 hover:border-slate-500 transition-all duration-300">
-                See How It Works
-              </button>
-            </Link>
-          </div>
-        </div>
-
-        {/* Right Section - Image Card */}
-        <div className="mt-16 md:mt-0 relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-neon-blue to-neon-purple rounded-3xl blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
-          <div className="relative w-80 md:w-96 lg:w-[450px] aspect-[4/5] bg-slate-800 rounded-3xl shadow-2xl overflow-hidden border border-slate-700/50">
-            <img
-              src={fitnessImage}
-              alt="Fitness AI tracking"
-              className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
-            />
-            {/* Overlay stats card */}
-            <div className="absolute bottom-6 left-6 right-6 glass rounded-2xl p-4 flex items-center justify-between">
-              <div>
-                <p className="text-slate-300 text-xs font-semibold uppercase tracking-wider">Squats Completed</p>
-                <p className="text-white text-2xl font-bold">124 <span className="text-green-400 text-sm">↑ 12%</span></p>
+      <div className="container mx-auto px-6 lg:px-16 relative z-10">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20">
+          
+          {/* Left Content */}
+          <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left">
+            <div className="inline-flex items-center space-x-2 glass px-4 py-2 rounded-full mb-8 border-gray-200 dark:border-neon-blue/30 transition-colors">
+              <span className="w-2 h-2 rounded-full bg-blue-500 dark:bg-neon-blue animate-pulse transition-colors"></span>
+              <span className="text-sm font-medium text-gray-600 dark:text-slate-300 transition-colors">Next-Gen Fitness Intelligence</span>
+            </div>
+            
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 dark:text-white leading-tight mb-6 tracking-tight transition-colors">
+              Transform With <br className="hidden md:block" />
+              <span className="brand-text">AI Precision</span>
+            </h1>
+            
+            <p className="text-lg md:text-xl text-gray-600 dark:text-slate-400 mb-10 max-w-2xl font-light leading-relaxed transition-colors">
+              Experience the future of fitness. Our advanced computer vision tracks your form in real-time, 
+              counts your reps, and personalizes your journey. No equipment needed.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <Link to="/register" className="btn-brand text-lg px-8 py-4 flex items-center justify-center space-x-2 group">
+                <span>Start Training Free</span>
+                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+              <Link to="/about" className="glass hover:bg-gray-100 dark:hover:bg-slate-800/80 text-gray-800 dark:text-white text-lg px-8 py-4 rounded-lg font-medium transition-colors flex items-center justify-center border border-gray-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-neon-blue/50">
+                Explore Features
+              </Link>
+            </div>
+            
+            {/* Social Proof */}
+            <div className="mt-12 flex items-center space-x-6">
+              <div className="flex -space-x-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="w-10 h-10 rounded-full border-2 border-gray-100 dark:border-slate-900 bg-gray-200 dark:bg-slate-800 flex items-center justify-center transition-colors" style={{ zIndex: 5 - i }}>
+                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i}&backgroundColor=4f46e5,3b82f6`} alt="User" className="w-full h-full rounded-full" />
+                  </div>
+                ))}
               </div>
-              <div className="h-10 w-10 rounded-full border-2 border-neon-blue flex items-center justify-center">
-                <span className="text-neon-blue text-xs font-bold">98%</span>
+              <div className="text-sm">
+                <p className="text-gray-900 dark:text-white font-bold transition-colors">10,000+</p>
+                <p className="text-gray-500 dark:text-slate-500 transition-colors">Athletes joined</p>
               </div>
             </div>
           </div>
+          
+          {/* Right Content - Banner Image */}
+          <div className="w-full lg:w-1/2 relative hidden md:flex items-center justify-center">
+            <div className="relative w-full aspect-square max-w-lg mx-auto overflow-hidden rounded-2xl shadow-xl border border-gray-200 dark:border-slate-700 transition-all">
+              <img src={bannerImage} alt="ExerLytix AI Training" className="w-full h-full object-cover relative z-0" />
+            </div>
+          </div>
+          
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

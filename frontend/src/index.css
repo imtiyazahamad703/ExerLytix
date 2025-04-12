@@ -4,36 +4,58 @@
 
 @theme {
   --font-sans: "Outfit", "Inter", sans-serif;
-  --color-primary: #3b82f6;
-  --color-primary-dark: #1d4ed8;
+  --color-neon-blue: #3b82f6; /* Blue-500 */
+  --color-neon-purple: #6366f1; /* Indigo-500 */
   --color-dark-bg: #0f172a;
-  --color-dark-card: #1e293b;
-  --color-neon-blue: #00f0ff;
-  --color-neon-purple: #b026ff;
+  --color-dark-surface: #1e293b;
+  
+  --color-brand: #6366f1;
+  --color-brand-hover: #4f46e5;
+  --color-brand-light: rgba(99, 102, 241, 0.1);
 }
 
 @layer base {
   @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
   
   body {
-    @apply bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-neon-blue selection:text-black;
+    @apply bg-gray-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-300;
   }
 }
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 dark:bg-slate-800/40 backdrop-blur-md border border-white/50 dark:border-slate-700/50 shadow-xl;
+    @apply bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 shadow-sm;
   }
+  
   .glass-card {
-    @apply glass rounded-2xl hover:bg-white/90 dark:hover:bg-slate-800/60 transition-all duration-300;
+    @apply bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow duration-300 rounded-xl;
   }
-  .text-glow {
-    text-shadow: 0 0 10px rgba(0, 240, 255, 0.5), 0 0 20px rgba(0, 240, 255, 0.3);
+
+  .glass-input {
+    @apply w-full bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all;
   }
+  
+  .btn-neon {
+    @apply relative bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 font-medium py-2 px-6 rounded-lg transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-slate-700 shadow-sm;
+  }
+
+  .btn-neon-purple {
+    @apply bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg shadow-sm transition-colors duration-200;
+  }
+
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-neon-blue dark:to-neon-purple;
+    @apply text-indigo-600 dark:text-indigo-400 font-bold;
   }
-  .neon-border {
-    @apply border border-transparent shadow-[0_0_15px_rgba(0,120,255,0.15)] dark:shadow-[0_0_15px_rgba(0,240,255,0.3)] hover:shadow-[0_0_25px_rgba(0,120,255,0.3)] dark:hover:shadow-[0_0_25px_rgba(0,240,255,0.6)] hover:border-blue-500 dark:hover:border-neon-blue transition-all duration-300;
+  
+  .btn-brand {
+    @apply bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg shadow-sm transition-colors duration-300;
+  }
+  
+  .card {
+    @apply bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow duration-300 rounded-xl p-6;
+  }
+  
+  .input-field {
+    @apply w-full bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all;
   }
 }

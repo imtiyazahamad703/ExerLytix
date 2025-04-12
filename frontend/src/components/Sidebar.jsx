@@ -1,74 +1,96 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import { FiHome, FiActivity, FiPieChart, FiUser, FiSettings } from "react-icons/fi";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FiHome, FiActivity, FiPieChart, FiUser, FiSettings, FiCamera, FiLogOut, FiSun, FiMoon, FiGlobe } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation();
-  const { profile } = useAuth();
+  const navigate = useNavigate();
+  const { profile, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
-  const menuItems = [
-    { name: "Dashboard", path: "/dashboard", icon: <FiHome size={20} /> },
-    { name: "Workouts", path: "/dashboard", icon: <FiActivity size={20} /> }, // Currently maps to dashboard
-    { name: "Nutrition", path: "/nutrition", icon: <FiPieChart size={20} /> },
-    { name: "Profile", path: "/profile", icon: <FiUser size={20} /> },
-    { name: "Settings", path: "/settings", icon: <FiSettings size={20} /> },
+  const navItems = [
+    { path: '/', label: 'Main Website', icon: <FiGlobe size={20} /> },
+    { path: '/dashboard', label: 'Overview', icon: <FiHome size={20} /> },
+    { path: '/workouts', label: 'Workouts', icon: <FiActivity size={20} /> },
+    { path: '/meal-planner', label: 'Meal Planner', icon: <FiPieChart size={20} /> },
+    { path: '/bmi', label: 'BMI Calculator', icon: <FiUser size={20} /> },
   ];
+
+  const handleLogout = () => {
+    logout();
+    setIsOpen(false);
+    navigate('/');
+  };
 
   return (
     <>
-      {/* Overlay for mobile */}
+      {/* Mobile overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-gray-900/50 dark:bg-black/50 backdrop-blur-sm z-40 lg:hidden transition-colors"
           onClick={() => setIsOpen(false)}
-        ></div>
+        />
       )}
 
       {/* Sidebar Content */}
       <aside 
-        className={`fixed lg:static top-0 left-0 h-full w-64 glass border-r border-slate-200 dark:border-slate-700/50 z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 pt-24 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed lg:static top-0 left-0 h-full w-64 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-r border-gray-200 dark:border-slate-700/50 z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 pt-24 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="flex flex-col h-full px-4 pb-8">
-          
-          {/* User Profile Summary */}
-          <div className="flex items-center space-x-4 mb-8 p-4 glass-card">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
-              {profile?.name ? profile.name.charAt(0).toUpperCase() : 'U'}
-            </div>
-            <div>
-              <h3 className="text-slate-800 dark:text-white font-semibold">{profile?.name || "User"}</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 truncate w-32">{profile?.email || "user@example.com"}</p>
-            </div>
-          </div>
-
           {/* Navigation Links */}
           <nav className="flex-1 space-y-2">
-            {menuItems.map((item) => {
-              const isActive = location.pathname === item.path;
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path || (item.path !== '/dashboard' && location.pathname.startsWith(item.path));
               return (
                 <Link
-                  key={item.name}
+                  key={item.path}
                   to={item.path}
                   onClick={() => setIsOpen(false)}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ${
                     isActive 
-                      ? 'bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-neon-blue shadow-sm' 
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-blue-50 dark:bg-slate-800/80 text-blue-600 dark:text-neon-blue border border-blue-200 dark:border-neon-blue/30 shadow-sm dark:shadow-[0_0_10px_rgba(0,240,255,0.2)]' 
+                      : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800/50 hover:text-gray-900 dark:hover:text-white border border-transparent'
                   }`}
                 >
-                  <span className={`${isActive ? 'text-blue-600 dark:text-neon-blue' : 'text-slate-400'}`}>
+                  <span className={`${isActive ? 'text-blue-600 dark:text-neon-blue' : 'text-gray-500 dark:text-slate-400'} transition-colors`}>
                     {item.icon}
                   </span>
-                  <span className="font-medium">{item.name}</span>
+                  <span className="font-medium">{item.label}</span>
                 </Link>
               );
             })}
           </nav>
 
-          {/* Logout Button */}
-          <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-700/50">
-            <button className="flex items-center space-x-3 w-full px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+          {/* Bottom Settings / Theme / Logout */}
+          <div className="pt-4 mt-4 border-t border-gray-200 dark:border-slate-700/50 transition-colors space-y-2">
+            <button
+              onClick={toggleTheme}
+              className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800/50 hover:text-gray-900 dark:hover:text-white border border-transparent"
+            >
+              {theme === "dark" ? <FiSun size={20} /> : <FiMoon size={20} />}
+              <span className="font-medium">{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+            </button>
+            
+            <Link
+              to="/settings"
+              onClick={() => setIsOpen(false)}
+              className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+                location.pathname === '/settings' 
+                  ? 'bg-blue-50 dark:bg-slate-800/80 text-blue-600 dark:text-neon-blue border border-blue-200 dark:border-neon-blue/30 shadow-sm' 
+                  : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800/50 hover:text-gray-900 dark:hover:text-white border border-transparent'
+              }`}
+            >
+              <FiSettings size={20} className={location.pathname === '/settings' ? 'text-blue-600 dark:text-neon-blue' : 'text-gray-500 dark:text-slate-400'} />
+              <span className="font-medium">Settings</span>
+            </Link>
+
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 border border-transparent"
+            >
+              <FiLogOut size={20} />
               <span className="font-medium">Sign Out</span>
             </button>
           </div>

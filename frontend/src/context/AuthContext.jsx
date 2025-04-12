@@ -44,8 +44,16 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
   };
 
+  const login = (userData) => {
+    updateProfile(userData);
+  };
+
+  const logout = () => {
+    clearProfile();
+  };
+
   return (
-    <AuthContext.Provider value={{ profile, updateProfile, clearProfile }}>
+    <AuthContext.Provider value={{ profile, updateProfile, clearProfile, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
