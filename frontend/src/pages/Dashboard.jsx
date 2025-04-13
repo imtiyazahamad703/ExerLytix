@@ -11,8 +11,6 @@ const Dashboard = () => {
   const { profile } = useAuth();
   const [userLog, setUserLog] = useState(null);
   const [history, setHistory] = useState([]);
-  const [output, setOutput] = useState("");
-  const [isRunning, setIsRunning] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [profilePic, setProfilePic] = useState(null);
   const fileInputRef = useRef(null);
@@ -42,16 +40,7 @@ const Dashboard = () => {
   const [caloriesData, setCaloriesData] = useState({ labels: [], datasets: [] });
   const [exerciseDistribution, setExerciseDistribution] = useState({ labels: [], datasets: [] });
 
-  const exercises = [
-    { name: "Push-Up", key: "push-up", color: "from-blue-500 to-cyan-400" },
-    { name: "Pull-Up", key: "pull-up", color: "from-purple-500 to-pink-500" },
-    { name: "Squat", key: "squat", color: "from-orange-500 to-yellow-400" },
-    { name: "Walk", key: "walk", color: "from-emerald-500 to-teal-400" },
-    { name: "Sit-Up", key: "sit-up", color: "from-rose-500 to-red-400" },
-    { name: "Bicep Curl", key: "bicep", color: "from-indigo-500 to-blue-500" },
-    { name: "Shoulder Raise", key: "shoulder-raise", color: "from-fuchsia-500 to-purple-500" },
-    { name: "Shoulder Press", key: "shoulder-press", color: "from-cyan-500 to-blue-500" },
-  ];
+
 
   useEffect(() => {
     if (profile?.userId) {
@@ -135,40 +124,7 @@ const Dashboard = () => {
     });
   };
 
-  const runPythonScript = async (exerciseType) => {
-    try {
-      setIsRunning(true);
-      setOutput(`Initializing ${exerciseType} tracker...`);
-      const response = await fetch("http://localhost:5000/run-python", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ exercise_type: exerciseType }),
-      });
-      const data = await response.json();
-      setOutput(data.message || data.error);
-    } catch (error) {
-      setOutput("Error starting AI tracker");
-    }
-  };
 
-  const stopPythonScript = async () => {
-    try {
-      setOutput("Stopping AI tracker...");
-      const response = await fetch("http://localhost:5000/stop-python", {
-        method: "POST",
-      });
-      const data = await response.json();
-      setOutput(data.message || data.error);
-      setIsRunning(false);
-      
-      if (data.message && !data.error) {
-        fetchUserLog(profile.userId);
-        fetchHistory(profile.userId);
-      }
-    } catch (error) {
-      setOutput("Error stopping script");
-    }
-  };
 
   const formatDuration = (minutes) => {
     if (!minutes) return "0m";
@@ -261,49 +217,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* AI Tracker Console */}
-          {output && (
-            <div className={`mb-10 glass-card p-6 border ${isRunning ? 'border-neon-blue shadow-[0_0_20px_rgba(0,240,255,0.2)]' : 'border-slate-700/50'} flex flex-col md:flex-row justify-between items-center transition-all duration-300`}>
-              <div className="w-full md:w-auto mb-4 md:mb-0">
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center">
-                  {isRunning && <span className="w-2 h-2 rounded-full bg-neon-blue animate-pulse mr-2"></span>}
-                  AI Tracker Status
-                </h3>
-                <p className="text-white text-lg font-mono bg-slate-900/80 p-3 rounded-lg border border-slate-700/50 break-all">{output}</p>
-              </div>
-              {isRunning && (
-                <button
-                  onClick={stopPythonScript}
-                  className="w-full md:w-auto px-8 py-3 bg-red-500/20 text-red-400 font-bold border border-red-500/50 rounded-lg hover:bg-red-500 hover:text-white transition-all duration-300 shadow-[0_0_15px_rgba(239,68,68,0.3)]"
-                >
-                  STOP TRACKER
-                </button>
-              )}
-            </div>
-          )}
 
-          {/* Exercises Grid */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-white tracking-wide mb-6">Start Training</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {exercises.map((ex) => (
-                <div
-                  key={ex.key}
-                  className="glass-card p-6 flex flex-col items-start justify-between relative overflow-hidden group min-h-[160px]"
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${ex.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500`}></div>
-                  <h3 className="text-xl font-bold text-white mb-6 relative z-10">{ex.name}</h3>
-                  <button
-                    onClick={() => runPythonScript(ex.key)}
-                    disabled={isRunning}
-                    className={`w-full py-3 rounded-xl font-bold text-sm uppercase tracking-wider relative z-10 transition-all duration-300 ${isRunning ? 'bg-slate-700 text-slate-500 cursor-not-allowed' : `bg-gradient-to-r ${ex.color} text-white shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-95`}`}
-                  >
-                    Start
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
 
           {/* Charts & Table */}
           <div className="mt-12">

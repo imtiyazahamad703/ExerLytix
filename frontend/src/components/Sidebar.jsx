@@ -11,8 +11,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const { theme, toggleTheme } = useTheme();
 
   const navItems = [
-    { path: '/', label: 'Main Website', icon: <FiGlobe size={20} /> },
-    { path: '/dashboard', label: 'Overview', icon: <FiHome size={20} /> },
+    { path: '/dashboard', label: 'Home', icon: <FiHome size={20} /> },
     { path: '/workouts', label: 'Workouts', icon: <FiActivity size={20} /> },
     { path: '/meal-planner', label: 'Meal Planner', icon: <FiPieChart size={20} /> },
     { path: '/bmi', label: 'BMI Calculator', icon: <FiUser size={20} /> },
