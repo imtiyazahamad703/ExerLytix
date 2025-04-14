@@ -13,6 +13,7 @@ import Contact from "./pages/Contact";
 import MealPlanner from "./pages/MealPlanner";
 import BmiCalculator from "./pages/BmiCalculator";
 import Workouts from "./pages/Workouts";
+import ExerciseLibrary from "./pages/ExerciseLibrary";
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -35,11 +36,11 @@ const Layout = () => {
   const location = useLocation();
   
   // These routes won't show the Footer
-  const hideFooterRoutes = ["/dashboard", "/workouts", "/meal-planner", "/bmi", "/login", "/register"];
+  const hideFooterRoutes = ["/dashboard", "/workouts", "/library", "/meal-planner", "/bmi", "/login", "/register"];
   const showFooter = !hideFooterRoutes.includes(location.pathname);
 
   // These routes won't show the Navbar
-  const hideNavbarRoutes = ["/dashboard", "/workouts", "/meal-planner", "/bmi"];
+  const hideNavbarRoutes = ["/dashboard", "/workouts", "/library", "/meal-planner", "/bmi"];
   const showNavbar = !hideNavbarRoutes.includes(location.pathname);
 
   return (
@@ -60,6 +61,7 @@ const Layout = () => {
           {/* Protected Routes - Redirect to Login if not logged in */}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/workouts" element={<ProtectedRoute><Workouts /></ProtectedRoute>} />
+          <Route path="/library" element={<ProtectedRoute><ExerciseLibrary /></ProtectedRoute>} />
           <Route path="/meal-planner" element={<ProtectedRoute><MealPlanner /></ProtectedRoute>} />
           <Route path="/bmi" element={<ProtectedRoute><BmiCalculator /></ProtectedRoute>} />
         </Routes>

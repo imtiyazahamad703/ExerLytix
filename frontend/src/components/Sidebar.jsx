@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FiHome, FiActivity, FiPieChart, FiUser, FiSettings, FiCamera, FiLogOut, FiSun, FiMoon, FiGlobe } from "react-icons/fi";
+import { FiHome, FiActivity, FiPieChart, FiUser, FiSettings, FiCamera, FiLogOut, FiSun, FiMoon, FiGlobe, FiBookOpen } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 
@@ -13,6 +13,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const navItems = [
     { path: '/dashboard', label: 'Home', icon: <FiHome size={20} /> },
     { path: '/workouts', label: 'Workouts', icon: <FiActivity size={20} /> },
+    { path: '/library', label: 'Exercise Library', icon: <FiBookOpen size={20} /> },
     { path: '/meal-planner', label: 'Meal Planner', icon: <FiPieChart size={20} /> },
     { path: '/bmi', label: 'BMI Calculator', icon: <FiUser size={20} /> },
   ];
