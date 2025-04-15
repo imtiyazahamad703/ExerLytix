@@ -1,10 +1,10 @@
 package com.immutech.ExerLytix.controller;
 
-import com.immutech.ExerLytix.dto.PantryDto;
+import com.immutech.ExerLytix.dto.SavedMealPlanDto;
 import com.immutech.ExerLytix.entity.Member;
-import com.immutech.ExerLytix.entity.PantryItem;
+import com.immutech.ExerLytix.entity.SavedMealPlan;
 import com.immutech.ExerLytix.repo.MemberRepository;
-import com.immutech.ExerLytix.repo.PantryRepository;
+import com.immutech.ExerLytix.repo.SavedMealPlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,34 +14,34 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/pantry/{userId}")
+@RequestMapping("/api/saved-plans/{userId}")
 @CrossOrigin(origins = "*")
-public class PantryController {
+public class SavedMealPlanController {
 
     @Autowired
-    private PantryRepository pantryRepository;
+    private SavedMealPlanRepository savedMealPlanRepository;
 
     @Autowired
     private MemberRepository memberRepository;
 
     @GetMapping
-    public ResponseEntity<List<PantryDto>> getPantryItems(@PathVariable Integer userId) {
+    public ResponseEntity<List<SavedMealPlanDto>> getSavedPlans(@PathVariable Integer userId) {
         if (userId == null) {
             return ResponseEntity.status(401).build();
         }
         
-        List<PantryItem> items = pantryRepository.findByMemberId(userId);
-        List<PantryDto> dtos = items.stream()
-                .map(item -> new PantryDto(item.getId(), item.getFdcId(), item.getName()))
+        List<SavedMealPlan> plans = savedMealPlanRepository.findByMemberId(userId);
+        List<SavedMealPlanDto> dtos = plans.stream()
+                .map(p -> new SavedMealPlanDto(p.getId(), p.getTitle(), p.getTotalCalories(), p.getTotalProtein(), p.getItemsJson()))
                 .collect(Collectors.toList());
                 
         return ResponseEntity.ok(dtos);
     }
 
     @PostMapping
-    public ResponseEntity<PantryDto> addPantryItem(
+    public ResponseEntity<SavedMealPlanDto> addSavedPlan(
             @PathVariable Integer userId,
-            @RequestBody PantryDto dto) {
+            @RequestBody SavedMealPlanDto dto) {
             
         if (userId == null) {
             return ResponseEntity.status(401).build();
@@ -52,14 +52,14 @@ public class PantryController {
             return ResponseEntity.notFound().build();
         }
 
-        PantryItem item = new PantryItem(memberOpt.get(), dto.getFdcId(), dto.getName());
-        item = pantryRepository.save(item);
+        SavedMealPlan plan = new SavedMealPlan(memberOpt.get(), dto.getTitle(), dto.getTotalCalories(), dto.getTotalProtein(), dto.getItemsJson());
+        plan = savedMealPlanRepository.save(plan);
         
-        return ResponseEntity.ok(new PantryDto(item.getId(), item.getFdcId(), item.getName()));
+        return ResponseEntity.ok(new SavedMealPlanDto(plan.getId(), plan.getTitle(), plan.getTotalCalories(), plan.getTotalProtein(), plan.getItemsJson()));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePantryItem(
+    public ResponseEntity<Void> deleteSavedPlan(
             @PathVariable Integer userId,
             @PathVariable Long id) {
             
@@ -67,12 +67,11 @@ public class PantryController {
             return ResponseEntity.status(401).build();
         }
         
-        Optional<PantryItem> itemOpt = pantryRepository.findById(id);
-        if (itemOpt.isPresent()) {
-            PantryItem item = itemOpt.get();
-            // Ensure the item belongs to the user
-            if (item.getMember().getId() == userId) {
-                pantryRepository.delete(item);
+        Optional<SavedMealPlan> planOpt = savedMealPlanRepository.findById(id);
+        if (planOpt.isPresent()) {
+            SavedMealPlan plan = planOpt.get();
+            if (plan.getMember().getId() == userId) {
+                savedMealPlanRepository.delete(plan);
                 return ResponseEntity.ok().build();
             } else {
                 return ResponseEntity.status(403).build();

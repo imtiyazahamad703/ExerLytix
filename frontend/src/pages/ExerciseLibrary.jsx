@@ -13,6 +13,9 @@ const WGER_CATEGORIES = [
   { id: 13, name: "Shoulders" }
 ];
 
+// Module-level cache to prevent re-fetching on tab switch
+const exerciseCache = {};
+
 const ExerciseImage = ({ src, alt }) => {
   const [loaded, setLoaded] = useState(false);
 
@@ -46,6 +49,11 @@ const ExerciseLibrary = () => {
   const [error, setError] = useState("");
 
   const fetchExercises = async (categoryId) => {
+    if (exerciseCache[categoryId]) {
+      setExercises(exerciseCache[categoryId]);
+      return;
+    }
+    
     setLoading(true);
     setError("");
     try {
@@ -86,6 +94,7 @@ const ExerciseLibrary = () => {
         };
       });
 
+      exerciseCache[categoryId] = parsedExercises;
       setExercises(parsedExercises);
     } catch (err) {
       setError(err.message);
@@ -109,13 +118,13 @@ const ExerciseLibrary = () => {
           
           <div className="mb-8 flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-wide flex items-center">
+              <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-wide flex items-center">
                 <svg className="w-8 h-8 text-neon-blue mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
                 Exercise <span className="gradient-text">Library</span>
               </h1>
-              <p className="text-slate-400 mt-2">Explore exercises with full visual guides (Powered by wger).</p>
+              <p className="text-slate-600 dark:text-slate-400 mt-2">Explore exercises with full visual guides (Powered by wger).</p>
             </div>
             
             <div className="flex items-center gap-4">
@@ -123,7 +132,7 @@ const ExerciseLibrary = () => {
                 <select 
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="appearance-none bg-slate-800 border border-slate-700 text-white rounded-lg px-6 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-neon-blue transition-colors cursor-pointer"
+                  className="appearance-none bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg px-6 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-neon-blue transition-colors cursor-pointer"
                 >
                   <optgroup label="Body Regions">
                     {WGER_CATEGORIES.map(cat => (
@@ -138,7 +147,7 @@ const ExerciseLibrary = () => {
 
               {/* Mobile Sidebar Toggle */}
               <button 
-                className="lg:hidden p-2 rounded-lg bg-slate-800 border border-slate-700 text-neon-blue shadow-sm"
+                className="lg:hidden p-2 rounded-lg bg-white/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-neon-blue shadow-sm"
                 onClick={() => setIsSidebarOpen(true)}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
@@ -164,10 +173,10 @@ const ExerciseLibrary = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {exercises.map((ex) => (
-                <div key={ex.id} className="glass-card flex flex-col border border-slate-700/50 hover:border-neon-purple transition-all duration-300 rounded-xl overflow-hidden shadow-lg">
+                <div key={ex.id} className="bg-white dark:glass-card flex flex-col border border-slate-200 dark:border-slate-700/50 hover:border-neon-blue dark:hover:border-neon-purple transition-all duration-300 rounded-xl overflow-hidden shadow-lg">
                   
                   {/* Image Display */}
-                  <div className="h-64 bg-white flex items-center justify-center p-2 border-b border-slate-700/50 rounded-t-xl">
+                  <div className="h-64 bg-slate-50 dark:bg-white flex items-center justify-center p-2 border-b border-slate-200 dark:border-slate-700/50 rounded-t-xl">
                     {ex.image ? (
                       <ExerciseImage src={ex.image} alt={ex.name} />
                     ) : (
@@ -182,19 +191,19 @@ const ExerciseLibrary = () => {
 
                   <div className="p-6 flex flex-col flex-1">
                     <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-xl font-bold text-white leading-tight capitalize">{ex.name}</h3>
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight capitalize">{ex.name}</h3>
                     </div>
                     
                     <div className="flex gap-2 mb-6 flex-wrap">
-                      <span className="bg-slate-800 text-slate-300 px-3 py-1 rounded-md text-xs font-medium border border-slate-700">
+                      <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 py-1 rounded-md text-xs font-medium border border-slate-200 dark:border-slate-700">
                         Equip: {ex.equipment || 'Bodyweight'}
                       </span>
                     </div>
                     
                     <div className="flex-1 mt-auto">
-                      <p className="text-sm text-slate-400 font-semibold mb-2">Instructions:</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 font-semibold mb-2">Instructions:</p>
                       <div 
-                        className="text-slate-300 text-sm leading-relaxed line-clamp-6 hover:line-clamp-none transition-all duration-300 prose prose-invert max-w-none"
+                        className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed line-clamp-6 hover:line-clamp-none transition-all duration-300 prose prose-slate dark:prose-invert max-w-none"
                         dangerouslySetInnerHTML={{ __html: ex.description }}
                       />
                     </div>
