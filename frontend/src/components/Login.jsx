@@ -103,7 +103,7 @@ const Login = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="input-field pl-11 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white rounded-lg focus:ring-blue-500 dark:focus:ring-neon-purple focus:border-blue-500 dark:focus:border-neon-purple block w-full p-2.5"
+                    className="input-field pl-11 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white rounded-lg focus:ring-blue-500 dark:focus:ring-neon-purple focus:border-blue-500 dark:focus:border-neon-purple block w-full"
                     placeholder="you@example.com"
                   />
                 </div>
@@ -125,7 +125,7 @@ const Login = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="input-field pl-11 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white rounded-lg focus:ring-blue-500 dark:focus:ring-neon-purple focus:border-blue-500 dark:focus:border-neon-purple block w-full p-2.5"
+                    className="input-field pl-11 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white rounded-lg focus:ring-blue-500 dark:focus:ring-neon-purple focus:border-blue-500 dark:focus:border-neon-purple block w-full"
                     placeholder="••••••••"
                   />
                 </div>

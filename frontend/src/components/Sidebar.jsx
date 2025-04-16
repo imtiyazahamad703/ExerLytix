@@ -36,9 +36,9 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
       {/* Sidebar Content */}
       <aside 
-        className={`fixed lg:static top-0 left-0 h-full w-64 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-r border-gray-200 dark:border-slate-700/50 z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 pt-24 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed lg:sticky top-0 bottom-0 left-0 w-64 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-r border-gray-200 dark:border-slate-700/50 z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 pt-24 h-screen ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div className="flex flex-col h-full px-4 pb-8">
+        <div className="flex flex-col h-full px-4 pb-8 overflow-y-auto hide-scrollbar">
           {/* Navigation Links */}
           <nav className="flex-1 space-y-2">
             {navItems.map((item) => {

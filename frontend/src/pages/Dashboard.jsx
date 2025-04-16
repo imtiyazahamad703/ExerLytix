@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
-import LineChart from "../Charts/LineChart";
+import BarChart from "../Charts/BarChart";
 import DoughnutChart from "../Charts/DoughnutChart";
 import WorkoutHistoryTable from "../components/WorkoutHistoryTable";
 import { useAuth } from "../context/AuthContext";
@@ -14,6 +14,7 @@ const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [profilePic, setProfilePic] = useState(null);
   const [quote, setQuote] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -67,9 +68,8 @@ const Dashboard = () => {
 
   const fetchUserLog = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:8081/api/exercise/latest/${userId}`);
-      const data = await response.json();
-      setUserLog(data);
+      const response = await axiosInstance.get(`/exercise/latest/${userId}?t=${Date.now()}`);
+      setUserLog(response.data);
     } catch (error) {
       console.error("Error fetching user log:", error);
     }
@@ -77,7 +77,7 @@ const Dashboard = () => {
 
   const fetchHistory = async (userId) => {
     try {
-      const response = await axiosInstance.get(`/api/exercise/history/${userId}`);
+      const response = await axiosInstance.get(`/exercise/history/${userId}?t=${Date.now()}`);
       const workouts = response.data;
       setHistory(workouts);
       processChartData(workouts);
@@ -86,13 +86,41 @@ const Dashboard = () => {
     }
   };
 
+  const handleRefresh = async () => {
+    if (!profile?.userId) return;
+    setIsRefreshing(true);
+    await Promise.all([
+      fetchUserLog(profile.userId),
+      fetchHistory(profile.userId)
+    ]);
+    setTimeout(() => setIsRefreshing(false), 500); // Small delay for UX
+  };
+
   const processChartData = (workouts) => {
     if (!workouts || workouts.length === 0) return;
 
-    // Process Doughnut Chart
+    // Get current week's workouts (Monday to Sunday)
+    const now = new Date();
+    const currentDay = now.getDay();
+    const diffToMon = currentDay === 0 ? 6 : currentDay - 1;
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - diffToMon);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    const weeklyWorkouts = workouts.filter(w => {
+      // replace dashes to avoid UTC timezone shift issues, if it's just a date string
+      const d = new Date(w.date);
+      return d >= startOfWeek && d <= endOfWeek;
+    });
+
+    // Process Doughnut Chart (Weekly)
     let totals = { pushUp: 0, pullUp: 0, squat: 0, walk: 0, sitUp: 0, bicepCurl: 0, shoulderRaise: 0, shoulderPress: 0 };
     
-    workouts.forEach(w => {
+    weeklyWorkouts.forEach(w => {
       totals.pushUp += w.pushUp || 0;
       totals.pullUp += w.pullUp || 0;
       totals.squat += w.squat || 0;
@@ -116,38 +144,44 @@ const Dashboard = () => {
       }],
     });
 
-    // Process Line Chart
-    const recent = [...workouts].reverse().slice(0, 7).reverse();
-    const dates = recent.map(w => {
+    // Process Bar Chart (Weekly Mon-Sun)
+    const weekLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const caloriesByDay = [0, 0, 0, 0, 0, 0, 0];
+
+    weeklyWorkouts.forEach(w => {
       const d = new Date(w.date);
-      return `${d.getMonth()+1}/${d.getDate()}`;
+      let dayIndex = d.getDay() - 1;
+      if (dayIndex === -1) dayIndex = 6; // Sunday
+      caloriesByDay[dayIndex] += w.calories || 0;
     });
-    
-    const intensity = recent.map(w => 
-      (w.pushUp||0) + (w.pullUp||0) + (w.squat||0) + (w.walk||0) + (w.sitUp||0) + (w.bicepCurl||0) + (w.shoulderRaise||0) + (w.shoulderPress||0)
-    );
 
     setCaloriesData({
-      labels: dates.length ? dates : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-      datasets: [{
-        label: "Total Reps (Intensity)",
-        data: intensity.length ? intensity : [0, 0, 0, 0, 0, 0, 0],
-        borderColor: "#00f0ff",
-        backgroundColor: "rgba(0, 240, 255, 0.1)",
-        tension: 0.4,
-        fill: true,
-      }],
+      labels: weekLabels,
+      datasets: [
+        {
+          label: "Calories",
+          data: caloriesByDay,
+          backgroundColor: "#a3e635", // neon lime green
+          borderRadius: 4,
+          barThickness: 20,
+        }
+      ]
     });
   };
 
 
 
-  const formatDuration = (minutes) => {
-    if (!minutes) return "0m";
-    const hrs = Math.floor(minutes / 60);
-    const mins = Math.floor(minutes % 60);
-    if (hrs > 0) return `${hrs}h ${mins}m`;
-    else return `${mins}m`;
+  const formatDuration = (seconds) => {
+    if (!seconds) return "0s";
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    let result = "";
+    if (hrs > 0) result += `${hrs}h `;
+    if (mins > 0 || hrs > 0) result += `${mins}m `;
+    result += `${secs}s`;
+    return result.trim();
   };
 
   return (
@@ -158,21 +192,33 @@ const Dashboard = () => {
         <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
         
         {/* Main Content */}
-        <div className="flex-1 px-4 sm:px-6 lg:px-10 py-8 max-w-7xl mx-auto w-full relative z-10">
+        <div className="flex-1 px-4 sm:px-6 lg:px-10 pt-20 pb-8 max-w-7xl mx-auto w-full relative z-10">
           
           {/* Header */}
-          <div className="mb-8 flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
+          <div className="mb-12 flex justify-between items-start md:items-center flex-col md:flex-row gap-6">
             <div>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-wide">
+              <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-wide">
                 Welcome back, <span className="gradient-text">{profile?.name || "Athlete"}</span>
               </h1>
-              <p className="text-slate-400 mt-2">Track your progress and push your limits today.</p>
+              <p className="text-slate-500 dark:text-slate-400 mt-3 text-lg">Track your progress and push your limits today.</p>
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
+              {/* Refresh Button */}
+              <button 
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="flex items-center justify-center p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-neon-blue hover:text-neon-blue text-slate-500 dark:text-slate-300 transition-all shadow-md group"
+                title="Refresh Data"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={`w-6 h-6 ${isRefreshing ? 'animate-spin text-neon-blue' : ''}`}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+              </button>
+              
               {/* Profile Image Uploader */}
               <div 
-                className="relative w-14 h-14 md:w-16 md:h-16 rounded-full bg-slate-800 flex items-center justify-center text-white font-bold text-lg shadow-lg overflow-hidden cursor-pointer border-2 border-slate-700 hover:border-neon-blue transition-colors group"
+                className="relative w-20 h-20 md:w-24 md:h-24 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-800 dark:text-white font-bold text-3xl shadow-[0_0_20px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_rgba(0,0,0,0.3)] overflow-hidden cursor-pointer border-2 border-slate-300 dark:border-slate-700 hover:border-neon-blue transition-colors group"
                 onClick={() => fileInputRef.current?.click()}
               >
                 {profilePic ? (
@@ -224,25 +270,27 @@ const Dashboard = () => {
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
             <div className="glass-card p-6 border-l-4 border-l-neon-blue">
-              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">Workouts Completed</h3>
-              <p className="text-3xl font-bold text-white flex items-baseline">
-                {userLog ? userLog.totalExercisesCompleted : '0'}
+              <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Workouts Completed</h3>
+              <p className="text-3xl font-black text-slate-900 dark:text-white flex items-baseline">
+                {history.length}
                 <span className="ml-2 text-sm text-neon-blue font-medium">sessions</span>
               </p>
             </div>
             <div className="glass-card p-6 border-l-4 border-l-neon-purple">
-              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">Calories Burned</h3>
-              <p className="text-3xl font-bold text-white flex items-baseline">
-                {userLog ? userLog.calories : '0'}
+              <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Calories Burned</h3>
+              <p className="text-3xl font-black text-slate-900 dark:text-white flex items-baseline">
+                {userLog?.calories || 0}
                 <span className="ml-2 text-sm text-neon-purple font-medium">kcal</span>
               </p>
             </div>
             <div className="glass-card p-6 border-l-4 border-l-emerald-400">
-              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">Active Time</h3>
-              <p className="text-3xl font-bold text-white flex items-baseline">
-                {userLog ? formatDuration(userLog.duration) : '0m'}
-                <span className="ml-2 text-sm text-emerald-400 font-medium">today</span>
-              </p>
+              <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Active Time</h3>
+              <div className="flex items-end gap-2">
+                <span className="text-3xl font-black text-slate-900 dark:text-white">
+                {userLog ? formatDuration(userLog.duration) : '0s'}
+                </span>
+                <span className="text-sm font-medium text-emerald-500 dark:text-neon-blue mb-1">today</span>
+              </div>
             </div>
           </div>
 
@@ -255,12 +303,12 @@ const Dashboard = () => {
             {history.length > 0 ? (
               <>
                 <div className="flex flex-col lg:flex-row gap-6 mb-12">
-                  <div className="flex-1 glass-card p-6 min-w-0">
-                    <LineChart data={caloriesData} title="Workout Intensity (Recent)" />
+                  <div className="flex-[2] glass-card p-6 border border-slate-200 dark:border-slate-700/50 rounded-xl bg-white dark:bg-slate-800">
+                    <BarChart data={caloriesData} title="Calories Burned (This Week)" />
                   </div>
-                  <div className="flex-1 glass-card p-6 min-w-0 flex items-center justify-center">
-                    <div className="w-full max-w-md">
-                      <DoughnutChart data={exerciseDistribution} title="Exercise Distribution (All Time)" />
+                  <div className="flex-[1] glass-card p-6 min-w-0 flex items-center justify-center">
+                    <div className="w-full max-w-sm">
+                      <DoughnutChart data={exerciseDistribution} title="Exercise Distribution (This Week)" />
                     </div>
                   </div>
                 </div>

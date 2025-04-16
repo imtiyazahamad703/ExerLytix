@@ -30,10 +30,25 @@ const Nutrition = () => {
             <p className="text-gray-600 dark:text-slate-400 mb-6 text-sm transition-colors">
               Protein is essential for muscle repair and growth after intense AI-tracked workouts. Focus on lean sources like chicken, tofu, and beans.
             </p>
-            <ul className="text-gray-700 dark:text-slate-300 text-sm space-y-2 font-medium transition-colors">
-              <li>✅ Chicken Breast</li>
-              <li>✅ Greek Yogurt</li>
-              <li>✅ Lentils</li>
+            <ul className="text-gray-700 dark:text-slate-300 text-sm space-y-3 font-medium transition-colors">
+              <li className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 border border-emerald-200 dark:border-emerald-800/50">
+                  <svg className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <span>Chicken Breast</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 border border-emerald-200 dark:border-emerald-800/50">
+                  <svg className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <span>Greek Yogurt</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 border border-emerald-200 dark:border-emerald-800/50">
+                  <svg className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <span>Lentils</span>
+              </li>
             </ul>
           </div>
 
@@ -42,10 +57,25 @@ const Nutrition = () => {
             <p className="text-gray-600 dark:text-slate-400 mb-6 text-sm transition-colors">
               Carbohydrates fuel your brain and your workouts. Choose complex carbs for sustained energy without the crash.
             </p>
-            <ul className="text-gray-700 dark:text-slate-300 text-sm space-y-2 font-medium transition-colors">
-              <li>✅ Sweet Potatoes</li>
-              <li>✅ Oats</li>
-              <li>✅ Brown Rice</li>
+            <ul className="text-gray-700 dark:text-slate-300 text-sm space-y-3 font-medium transition-colors">
+              <li className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 border border-emerald-200 dark:border-emerald-800/50">
+                  <svg className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <span>Sweet Potatoes</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 border border-emerald-200 dark:border-emerald-800/50">
+                  <svg className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <span>Oats</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 border border-emerald-200 dark:border-emerald-800/50">
+                  <svg className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <span>Brown Rice</span>
+              </li>
             </ul>
           </div>
 
@@ -54,10 +84,25 @@ const Nutrition = () => {
             <p className="text-gray-600 dark:text-slate-400 mb-6 text-sm transition-colors">
               Fats are crucial for hormone regulation and joint health, especially when lifting weights or doing high-impact exercises.
             </p>
-            <ul className="text-gray-700 dark:text-slate-300 text-sm space-y-2 font-medium transition-colors">
-              <li>✅ Avocados</li>
-              <li>✅ Nuts & Seeds</li>
-              <li>✅ Olive Oil</li>
+            <ul className="text-gray-700 dark:text-slate-300 text-sm space-y-3 font-medium transition-colors">
+              <li className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 border border-emerald-200 dark:border-emerald-800/50">
+                  <svg className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <span>Avocados</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 border border-emerald-200 dark:border-emerald-800/50">
+                  <svg className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <span>Nuts & Seeds</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 border border-emerald-200 dark:border-emerald-800/50">
+                  <svg className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <span>Olive Oil</span>
+              </li>
             </ul>
           </div>
 

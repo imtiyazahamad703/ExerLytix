@@ -28,6 +28,7 @@ const MealPlanner = () => {
   const [results, setResults] = useState([]);
   const [mealPlan, setMealPlan] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchError, setSearchError] = useState("");
 
   // === SMART PLANNER STATES ===
   const [pantryChips, setPantryChips] = useState([]); 
@@ -71,6 +72,10 @@ const MealPlanner = () => {
     try {
       const response = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${inputValue}&api_key=${API_KEY}&pageSize=10`);
       const data = await response.json();
+      if (data.error) {
+         console.error("USDA API Error:", data.error.message);
+         return [];
+      }
       return (data.foods || []).map(food => ({
         value: food.fdcId,
         label: food.description.split(",")[0].toLowerCase()
@@ -105,16 +110,24 @@ const MealPlanner = () => {
   useEffect(() => {
     if (query.length < 3) {
       setResults([]);
+      setSearchError("");
       return;
     }
     setLoading(true);
+    setSearchError("");
     const timeoutId = setTimeout(async () => {
       try {
         const response = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&api_key=${API_KEY}&pageSize=5`);
         const data = await response.json();
-        setResults(data.foods || []);
+        if (data.error) {
+           setSearchError("API Rate Limit Exceeded. Please try again later or add your own API Key.");
+           setResults([]);
+        } else {
+           setResults(data.foods || []);
+        }
       } catch (error) {
         console.error(error);
+        setSearchError("Failed to fetch data.");
       }
       setLoading(false);
     }, 500); // Debounce delay
@@ -140,6 +153,26 @@ const MealPlanner = () => {
   const totalManualCarbs = mealPlan.reduce((acc, curr) => acc + curr.carbs, 0);
   const totalManualFat = mealPlan.reduce((acc, curr) => acc + curr.fat, 0);
 
+  const permanentlySaveManualPlan = async () => {
+    if (!userId || mealPlan.length === 0) return;
+    try {
+      const title = `Manual Log - ${new Date().toLocaleDateString()}`;
+      const res = await axiosInstance.post(`/saved-plans/${userId}`, {
+        title: title,
+        totalCalories: totalManualCalories,
+        totalProtein: totalManualProtein,
+        itemsJson: JSON.stringify(mealPlan.map(item => ({ name: item.name, amount: 100 }))) // Fallback amount 100g for manual logs
+      });
+      setSavedPlans([{ ...res.data, items: JSON.parse(res.data.itemsJson) }, ...savedPlans]);
+      setMealPlan([]); // Clear manual plan after save
+      alert("Manual log saved successfully to your DB plans!");
+      setActiveTab("smart"); // Switch to smart tab to see it
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save manual log.");
+    }
+  };
+
   // --- SMART GENERATOR FUNCTIONS ---
   const generateSmartDiet = async () => {
     if (pantryChips.length === 0) return alert("Add at least one food to your pantry!");
@@ -149,6 +182,12 @@ const MealPlanner = () => {
       const fdcIds = pantryChips.map(c => c.fdcId).join(",");
       const res = await fetch(`https://api.nal.usda.gov/fdc/v1/foods?fdcIds=${fdcIds}&api_key=${API_KEY}`);
       const foodsData = await res.json();
+      
+      if (foodsData.error) {
+         alert("USDA API Error: " + foodsData.error.message);
+         setIsGenerating(false);
+         return;
+      }
 
       const formattedFoods = foodsData.map(food => ({
         id: food.fdcId,
@@ -469,7 +508,9 @@ const MealPlanner = () => {
                 </div>
                 
                 <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                  {results.length === 0 && !loading && query.length >= 3 && <p className="text-slate-500">No results found.</p>}
+                  {searchError && <p className="text-red-500 font-bold p-4 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-200 dark:border-red-500/30">{searchError}</p>}
+                  {results.length === 0 && !loading && !searchError && query.length >= 3 && <p className="text-slate-500 p-4">No results found.</p>}
+                  {results.length === 0 && query.length > 0 && query.length < 3 && <p className="text-slate-500 p-4">Type at least 3 characters to search...</p>}
                   {results.map((food, index) => (
                     <div key={index} className="p-4 border border-slate-200 dark:border-slate-700/50 rounded-xl bg-slate-50 dark:bg-slate-800/30 flex justify-between items-center">
                       <div>
@@ -496,6 +537,16 @@ const MealPlanner = () => {
                   ))}
                   {mealPlan.length === 0 && <p className="text-slate-500 text-center py-10">Add foods from the left to build your log.</p>}
                 </div>
+                {mealPlan.length > 0 && (
+                  <div className="p-4 border-t border-slate-200 dark:border-slate-700/50 mt-4">
+                    <button 
+                      onClick={permanentlySaveManualPlan} 
+                      className="w-full py-3 bg-neon-blue hover:bg-blue-600 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                    >
+                      💾 Save Manual Log to Database
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}

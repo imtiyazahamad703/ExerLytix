@@ -1,11 +1,10 @@
 import React from "react";
-import { Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
@@ -14,23 +13,24 @@ import {
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend
 );
 
-const LineChart = ({ data, title }) => {
+const BarChart = ({ data, title }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: false },
+      legend: {
+        display: false,
+      },
       tooltip: {
         backgroundColor: "rgba(15, 23, 42, 0.9)",
         titleColor: "#fff",
-        bodyColor: "#f97316", // fiery orange
+        bodyColor: "#a3e635", // neon lime green
         padding: 10,
         cornerRadius: 8,
         displayColors: false,
@@ -44,12 +44,21 @@ const LineChart = ({ data, title }) => {
     scales: {
       y: {
         beginAtZero: true,
-        grid: { color: "rgba(255, 255, 255, 0.05)" },
-        ticks: { color: "#94a3b8", precision: 0 }
+        grid: {
+          color: "rgba(255, 255, 255, 0.05)",
+        },
+        ticks: {
+          color: "#94a3b8", // slate-400
+          precision: 0 // integers only
+        }
       },
       x: {
-        grid: { display: false },
-        ticks: { color: "#94a3b8" }
+        grid: {
+          display: false,
+        },
+        ticks: {
+          color: "#94a3b8",
+        }
       }
     }
   };
@@ -57,9 +66,9 @@ const LineChart = ({ data, title }) => {
   return (
     <div className="w-full h-[250px]">
       <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">{title}</h3>
-      <Line data={data} options={options} />
+      <Bar data={data} options={options} />
     </div>
   );
 };
 
-export default LineChart;
+export default BarChart;

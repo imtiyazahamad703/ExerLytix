@@ -16,12 +16,12 @@ CORS(app)
 session_state = {
     'running': False,
     'exercise': None,
-    'user_id': 1,
     'count': 0,
     'calories': 0,
     'start_time': None,
     'status': True,
-    'lock': threading.Lock()
+    'lock': threading.Lock(),
+    'user_id': None,
 }
 
 cap = None
@@ -44,8 +44,12 @@ CALORIE_MULTIPLIERS = {
 def set_user():
     try:
         data = request.get_json(force=True)
+        new_user_id = data.get('user_id')
+        if new_user_id is None:
+            return jsonify({"error": "user_id is required"}), 400
+            
         with session_state['lock']:
-            session_state['user_id'] = int(data.get('user_id', 1))
+            session_state['user_id'] = int(new_user_id)
         print(f"✅ Active user set to: {session_state['user_id']}")
         return jsonify({"message": "User ID set successfully", "user_id": session_state['user_id']}), 200
     except Exception as e:
@@ -57,6 +61,14 @@ def run_python():
     try:
         data = request.get_json()
         exercise_type = data.get('exercise_type', 'pull-up')
+        
+        # Optionally allow passing user_id directly in the run-python payload
+        if 'user_id' in data:
+            with session_state['lock']:
+                session_state['user_id'] = int(data['user_id'])
+                
+        if session_state['user_id'] is None:
+            return jsonify({"error": "No active user set. Call /set_user first or pass user_id."}), 400
 
         with session_state['lock']:
             if session_state['running']:

@@ -13,16 +13,31 @@ const WGER_CATEGORIES = [
   { id: 13, name: "Shoulders" }
 ];
 
-// Module-level cache to prevent re-fetching on tab switch
-const exerciseCache = {};
+// Use sessionStorage so cache survives HMR and page reloads
+const getCache = (key) => {
+  const cached = sessionStorage.getItem(`exercise_cache_${key}`);
+  return cached ? JSON.parse(cached) : null;
+};
+const setCache = (key, data) => {
+  sessionStorage.setItem(`exercise_cache_${key}`, JSON.stringify(data));
+};
 
 const ExerciseImage = ({ src, alt }) => {
   const [loaded, setLoaded] = useState(false);
+  const [showSkeleton, setShowSkeleton] = useState(false);
+
+  useEffect(() => {
+    // Only show skeleton if the image takes longer than 50ms to load (prevents flashing for cached images)
+    const timer = setTimeout(() => {
+      if (!loaded) setShowSkeleton(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [loaded]);
 
   return (
     <div className="relative w-full h-full flex items-center justify-center">
       {/* Skeleton Loader shown while downloading */}
-      {!loaded && (
+      {showSkeleton && !loaded && (
         <div className="absolute inset-0 bg-slate-700/50 animate-pulse rounded-md flex items-center justify-center">
            <svg className="w-8 h-8 text-slate-500 animate-spin" fill="none" viewBox="0 0 24 24">
              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -49,8 +64,9 @@ const ExerciseLibrary = () => {
   const [error, setError] = useState("");
 
   const fetchExercises = async (categoryId) => {
-    if (exerciseCache[categoryId]) {
-      setExercises(exerciseCache[categoryId]);
+    const cachedData = getCache(categoryId);
+    if (cachedData) {
+      setExercises(cachedData);
       return;
     }
     
@@ -94,7 +110,7 @@ const ExerciseLibrary = () => {
         };
       });
 
-      exerciseCache[categoryId] = parsedExercises;
+      setCache(categoryId, parsedExercises);
       setExercises(parsedExercises);
     } catch (err) {
       setError(err.message);
@@ -173,10 +189,10 @@ const ExerciseLibrary = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {exercises.map((ex) => (
-                <div key={ex.id} className="bg-white dark:glass-card flex flex-col border border-slate-200 dark:border-slate-700/50 hover:border-neon-blue dark:hover:border-neon-purple transition-all duration-300 rounded-xl overflow-hidden shadow-lg">
+                <div key={ex.id} className="glass-card flex flex-col hover:border-neon-blue dark:hover:border-neon-purple transition-all duration-300 overflow-hidden shadow-lg">
                   
                   {/* Image Display */}
-                  <div className="h-64 bg-slate-50 dark:bg-white flex items-center justify-center p-2 border-b border-slate-200 dark:border-slate-700/50 rounded-t-xl">
+                  <div className="h-64 bg-white flex items-center justify-center p-2 border-b border-slate-200 dark:border-slate-700/50 rounded-t-xl">
                     {ex.image ? (
                       <ExerciseImage src={ex.image} alt={ex.name} />
                     ) : (

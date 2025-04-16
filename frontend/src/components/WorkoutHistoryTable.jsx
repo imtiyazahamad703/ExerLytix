@@ -19,7 +19,7 @@ const WorkoutHistoryTable = ({ workoutsData = null }) => {
   const fetchHistory = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get(`/api/exercise/history/${profile.userId}`);
+      const response = await axiosInstance.get(`/exercise/history/${profile.userId}?t=${Date.now()}`);
       setWorkouts(response.data);
     } catch (error) {
       console.error("Error fetching workout history:", error);
@@ -36,12 +36,17 @@ const WorkoutHistoryTable = ({ workoutsData = null }) => {
     });
   };
 
-  const formatDuration = (minutes) => {
-    if (!minutes) return "0m";
-    const hrs = Math.floor(minutes / 60);
-    const mins = Math.floor(minutes % 60);
-    if (hrs > 0) return `${hrs}h ${mins}m`;
-    else return `${mins}m`;
+  const formatDuration = (seconds) => {
+    if (!seconds) return "0s";
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    let result = "";
+    if (hrs > 0) result += `${hrs}h `;
+    if (mins > 0 || hrs > 0) result += `${mins}m `;
+    result += `${secs}s`;
+    return result.trim();
   };
 
   if (loading) {
@@ -71,6 +76,10 @@ const WorkoutHistoryTable = ({ workoutsData = null }) => {
               <th className="px-6 py-4 font-semibold text-gray-500 dark:text-slate-400 uppercase text-xs tracking-wider text-center">Push-Ups</th>
               <th className="px-6 py-4 font-semibold text-gray-500 dark:text-slate-400 uppercase text-xs tracking-wider text-center">Pull-Ups</th>
               <th className="px-6 py-4 font-semibold text-gray-500 dark:text-slate-400 uppercase text-xs tracking-wider text-center">Squats</th>
+              <th className="px-6 py-4 font-semibold text-gray-500 dark:text-slate-400 uppercase text-xs tracking-wider text-center">Bicep Curls</th>
+              <th className="px-6 py-4 font-semibold text-gray-500 dark:text-slate-400 uppercase text-xs tracking-wider text-center">Shoulder Press</th>
+              <th className="px-6 py-4 font-semibold text-gray-500 dark:text-slate-400 uppercase text-xs tracking-wider text-center">Sit-Ups</th>
+              <th className="px-6 py-4 font-semibold text-gray-500 dark:text-slate-400 uppercase text-xs tracking-wider text-center">Walk (m)</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-slate-700/50">
@@ -96,11 +105,15 @@ const WorkoutHistoryTable = ({ workoutsData = null }) => {
                   <td className="px-6 py-4 text-center font-medium text-gray-700 dark:text-slate-300">{workout.pushUp || "-"}</td>
                   <td className="px-6 py-4 text-center font-medium text-gray-700 dark:text-slate-300">{workout.pullUp || "-"}</td>
                   <td className="px-6 py-4 text-center font-medium text-gray-700 dark:text-slate-300">{workout.squat || "-"}</td>
+                  <td className="px-6 py-4 text-center font-medium text-gray-700 dark:text-slate-300">{workout.bicepCurl || "-"}</td>
+                  <td className="px-6 py-4 text-center font-medium text-gray-700 dark:text-slate-300">{workout.shoulderPress || "-"}</td>
+                  <td className="px-6 py-4 text-center font-medium text-gray-700 dark:text-slate-300">{workout.sitUp || "-"}</td>
+                  <td className="px-6 py-4 text-center font-medium text-gray-700 dark:text-slate-300">{workout.walk || "-"}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="px-6 py-12 text-center text-slate-500">
+                <td colSpan="10" className="px-6 py-12 text-center text-slate-500">
                   No workout history found. Start exercising today!
                 </td>
               </tr>

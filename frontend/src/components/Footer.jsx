@@ -1,5 +1,5 @@
 import React from "react";
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa";
+import { FaGithub, FaLinkedinIn } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
@@ -42,16 +42,10 @@ const Footer = () => {
         <div>
           <h3 className="text-gray-900 dark:text-white font-semibold mb-4 transition-colors">Follow Us</h3>
           <div className="flex space-x-4">
-            <a href="#" className="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-slate-400 hover:bg-blue-600 hover:text-white dark:hover:bg-neon-blue dark:hover:text-slate-900 transition-all">
-              <FaFacebookF size={14} />
+            <a href="https://github.com/imtiyazahamad703" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-slate-400 hover:bg-gray-800 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-all">
+              <FaGithub size={16} />
             </a>
-            <a href="#" className="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-slate-400 hover:bg-blue-400 hover:text-white dark:hover:bg-neon-blue dark:hover:text-slate-900 transition-all">
-              <FaTwitter size={14} />
-            </a>
-            <a href="#" className="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-slate-400 hover:bg-pink-600 hover:text-white dark:hover:bg-neon-purple dark:hover:text-slate-900 transition-all">
-              <FaInstagram size={14} />
-            </a>
-            <a href="#" className="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-slate-400 hover:bg-blue-700 hover:text-white dark:hover:bg-neon-blue dark:hover:text-slate-900 transition-all">
+            <a href="https://www.linkedin.com/in/imtiyazahamad703" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-slate-400 hover:bg-blue-700 hover:text-white dark:hover:bg-neon-blue dark:hover:text-slate-900 transition-all">
               <FaLinkedinIn size={14} />
             </a>
           </div>

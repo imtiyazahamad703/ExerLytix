@@ -49,10 +49,19 @@ const Workouts = () => {
       setIsRunning(true);
       setOutput(`Initializing ${exerciseType} tracker...`);
       setStats({ count: 0, calories: 0, duration: 0 });
+      // Tell the python backend which user is currently active
+      if (profile?.userId) {
+        await fetch("http://localhost:5000/set_user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: profile.userId })
+        });
+      }
+
       const response = await fetch("http://localhost:5000/run-python", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ exercise_type: exerciseType }),
+        body: JSON.stringify({ exercise_type: exerciseType, user_id: profile?.userId }),
       });
       const data = await response.json();
       setOutput(data.message || data.error);
@@ -91,14 +100,14 @@ const Workouts = () => {
         <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
         
         {/* Main Content */}
-        <div className="flex-1 px-4 sm:px-6 lg:px-10 py-8 max-w-7xl mx-auto w-full relative z-10">
+        <div className="flex-1 px-4 sm:px-6 lg:px-10 pt-20 pb-8 max-w-7xl mx-auto w-full relative z-10">
           
           <div className="mb-8 flex justify-between items-center">
             <div>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-wide">
-                Training <span className="gradient-text">Arena</span>
+              <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-wide">
+                AI <span className="gradient-text">Tracker</span>
               </h1>
-              <p className="text-slate-400 mt-2">Select an exercise to start your AI-powered workout session.</p>
+              <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm md:text-base">Real-time form analysis & rep counting powered by Computer Vision.</p>
             </div>
             {/* Mobile Sidebar Toggle Button */}
             <button 
@@ -114,10 +123,10 @@ const Workouts = () => {
           {/* AI Tracker Console (Large Video Feed) */}
           {isRunning && (
             <div className="mb-12 glass-card p-6 md:p-8 border border-neon-blue shadow-[0_0_20px_rgba(0,240,255,0.2)]">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl md:text-2xl font-bold text-white flex items-center">
-                  <span className="w-3 h-3 md:w-4 md:h-4 rounded-full bg-red-500 animate-pulse mr-3"></span>
-                  LIVE: Tracking {output.replace('started', '').replace('Initializing', '').replace('tracker...', '').trim().toUpperCase()}
+              <div className="flex justify-between items-center mb-8">
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white flex items-center">
+                  <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse mr-3 shadow-[0_0_10px_rgba(16,185,129,0.8)]"></span>
+                  Active Session
                 </h3>
                 <button
                   onClick={stopPythonScript}
@@ -129,11 +138,11 @@ const Workouts = () => {
 
               <div className="flex flex-col lg:flex-row gap-8">
                 {/* Video Feed */}
-                <div className="lg:w-2/3 bg-black rounded-xl overflow-hidden border-2 border-slate-700/50 relative">
+                <div className="lg:w-3/4 bg-black rounded-xl overflow-hidden border-2 border-slate-700/50 relative self-start">
                   <img
                     src="http://localhost:5000/video_feed"
                     alt="AI Tracker Feed"
-                    className="w-full h-auto object-contain max-h-[720px]"
+                    className="w-full h-auto object-contain max-h-[800px]"
                     onError={(e) => { e.target.src = ''; setOutput('Camera feed not available'); }}
                   />
                   {!isRunning && (
@@ -144,16 +153,16 @@ const Workouts = () => {
                 </div>
 
                 {/* Real-time Stats */}
-                <div className="lg:w-1/3 flex flex-col gap-6">
-                  <div className="bg-slate-800/50 rounded-xl p-8 border border-slate-700 h-full flex flex-col justify-center items-center text-center">
+                <div className="lg:w-1/4 flex flex-col gap-6">
+                  <div className="bg-slate-800/50 rounded-xl p-6 lg:p-8 border border-slate-700 h-full flex flex-col justify-center items-center text-center">
                     <p className="text-sm text-slate-400 uppercase tracking-wider mb-2">Rep Count</p>
-                    <p className="text-7xl font-extrabold text-neon-blue drop-shadow-[0_0_10px_rgba(0,240,255,0.8)]">{stats.count}</p>
+                    <p className="text-6xl lg:text-7xl font-extrabold text-neon-blue drop-shadow-[0_0_10px_rgba(0,240,255,0.8)]">{stats.count}</p>
                   </div>
-                  <div className="bg-slate-800/50 rounded-xl p-8 border border-slate-700 h-full flex flex-col justify-center items-center text-center">
-                    <p className="text-sm text-slate-400 uppercase tracking-wider mb-2">Calories Burned</p>
-                    <p className="text-5xl font-extrabold text-neon-purple drop-shadow-[0_0_10px_rgba(176,38,255,0.8)]">{stats.calories} <span className="text-2xl text-slate-500">kcal</span></p>
+                  <div className="bg-slate-800/50 rounded-xl p-6 lg:p-8 border border-slate-700 h-full flex flex-col justify-center items-center text-center">
+                    <p className="text-sm text-slate-400 uppercase tracking-wider mb-2">Calories</p>
+                    <p className="text-4xl lg:text-5xl font-extrabold text-neon-purple drop-shadow-[0_0_10px_rgba(176,38,255,0.8)]">{stats.calories} <span className="text-xl lg:text-2xl text-slate-500">kcal</span></p>
                   </div>
-                  <div className="bg-slate-800/50 rounded-xl p-8 border border-slate-700 h-full flex flex-col justify-center items-center text-center">
+                  <div className="bg-slate-800/50 rounded-xl p-6 lg:p-8 border border-slate-700 h-full flex flex-col justify-center items-center text-center">
                     <p className="text-sm text-slate-400 uppercase tracking-wider mb-2">Duration</p>
                     <p className="text-5xl font-extrabold text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">{formatDuration(stats.duration)}</p>
                   </div>
@@ -163,8 +172,8 @@ const Workouts = () => {
           )}
 
           {!isRunning && output && (
-            <div className="mb-10 glass-card p-6 border border-slate-700/50">
-              <p className="text-slate-300 font-mono text-center">{output}</p>
+            <div className="mb-10 glass-card p-6 border border-slate-200 dark:border-slate-700/50">
+              <p className="text-slate-700 dark:text-slate-300 font-mono text-center">{output}</p>
             </div>
           )}
 
@@ -177,8 +186,8 @@ const Workouts = () => {
                     key={ex.key}
                     className="glass-card p-6 flex flex-col items-start justify-between relative overflow-hidden group min-h-[160px]"
                   >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${ex.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500`}></div>
-                    <h3 className="text-xl font-bold text-white mb-6 relative z-10">{ex.name}</h3>
+                    <div className={`absolute inset-0 bg-gradient-to-br ${ex.color} opacity-0 group-hover:opacity-10 dark:group-hover:opacity-20 transition-opacity duration-500`}></div>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 relative z-10">{ex.name}</h3>
                     <button
                       onClick={() => runPythonScript(ex.key)}
                       disabled={isRunning}
