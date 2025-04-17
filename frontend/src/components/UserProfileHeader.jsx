@@ -1,15 +1,17 @@
 // src/components/UserProfileHeader.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 const UserProfileHeader = ({ userId }) => {
   const [user, setUser] = useState({ name: "Guest", profilePhoto: null });
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:8080/api/member/${userId}`)
-      .then((res) => setUser(res.data))
-      .catch((err) => console.log(err));
+    if (userId) {
+      axiosInstance
+        .get(`/member/${userId}`)
+        .then((res) => setUser(res.data))
+        .catch((err) => console.log(err));
+    }
   }, [userId]);
 
   return (

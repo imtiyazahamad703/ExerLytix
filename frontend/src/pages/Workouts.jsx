@@ -27,7 +27,7 @@ const Workouts = () => {
     if (isRunning) {
       interval = setInterval(async () => {
         try {
-          const response = await fetch("http://localhost:5000/api/exercise-stats");
+          const response = await fetch(`${import.meta.env.VITE_PYTHON_API_URL || 'http://localhost:5000'}/api/exercise-stats`);
           const data = await response.json();
           if (data.running) {
             setStats({
@@ -51,14 +51,14 @@ const Workouts = () => {
       setStats({ count: 0, calories: 0, duration: 0 });
       // Tell the python backend which user is currently active
       if (profile?.userId) {
-        await fetch("http://localhost:5000/set_user", {
+        await fetch(`${import.meta.env.VITE_PYTHON_API_URL || 'http://localhost:5000'}/set_user`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id: profile.userId })
         });
       }
 
-      const response = await fetch("http://localhost:5000/run-python", {
+      const response = await fetch(`${import.meta.env.VITE_PYTHON_API_URL || 'http://localhost:5000'}/run-python`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ exercise_type: exerciseType, user_id: profile?.userId }),
@@ -74,7 +74,7 @@ const Workouts = () => {
   const stopPythonScript = async () => {
     try {
       setOutput("Stopping AI tracker...");
-      const response = await fetch("http://localhost:5000/stop-python", {
+      const response = await fetch(`${import.meta.env.VITE_PYTHON_API_URL || 'http://localhost:5000'}/stop-python`, {
         method: "POST",
       });
       const data = await response.json();
@@ -140,7 +140,7 @@ const Workouts = () => {
                 {/* Video Feed */}
                 <div className="lg:w-3/4 bg-black rounded-xl overflow-hidden border-2 border-slate-700/50 relative self-start">
                   <img
-                    src="http://localhost:5000/video_feed"
+                    src={`${import.meta.env.VITE_PYTHON_API_URL || 'http://localhost:5000'}/video_feed`}
                     alt="AI Tracker Feed"
                     className="w-full h-auto object-contain max-h-[800px]"
                     onError={(e) => { e.target.src = ''; setOutput('Camera feed not available'); }}

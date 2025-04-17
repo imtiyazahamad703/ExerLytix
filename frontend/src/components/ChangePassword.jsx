@@ -54,18 +54,17 @@ const ChangePassword = () => {
     if (!validateConfirmPassword(confirmNewPassword)) return;
 
     try {
-      const response = await fetch("http://localhost:8081/api/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, newPassword }),
+      const response = await axiosInstance.post("/reset-password", {
+        userId,
+        oldPassword,
+        newPassword
       });
 
-      const data = await response.json();
-      if (response.ok) {
+      if (response.status === 200) {
         setMessage("Password changed successfully!");
         setTimeout(() => navigate("/auth/login"), 2000);
       } else {
-        setMessage(data.message || "Error resetting password");
+        setMessage(response.data?.message || "Error resetting password");
       }
     } catch (err) {
       setMessage("Server error: " + err.message);
