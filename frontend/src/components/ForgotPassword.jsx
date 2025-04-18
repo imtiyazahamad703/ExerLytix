@@ -4,7 +4,11 @@ import { useNavigate, Link } from "react-router-dom";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -21,37 +25,61 @@ const ForgotPassword = () => {
     }
   };
 
+  const validatePassword = (password) => {
+    const passwordRegex =
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setPasswordError(
+        "Password must be at least 8 characters, include a number and a special character"
+      );
+      return false;
+    } else {
+      setPasswordError("");
+      return true;
+    }
+  };
+
+  const validateConfirmPassword = (confirmPassword) => {
+    if (confirmPassword !== newPassword) {
+      setConfirmPasswordError("Passwords do not match");
+      return false;
+    } else {
+      setConfirmPasswordError("");
+      return true;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage(""); // Clear previous messages
+    setMessage("");
 
-    if (!validateEmail(email)) return;
+    const isEmailValid = validateEmail(email);
+    const isPasswordValid = validatePassword(newPassword);
+    const isConfirmValid = validateConfirmPassword(confirmNewPassword);
+
+    if (!isEmailValid || !isPasswordValid || !isConfirmValid) return;
 
     setLoading(true);
     try {
-      // This part only runs for successful (2xx) responses
-      const response = await axiosInstance.post("/forgot-password", { email });
+      const response = await axiosInstance.post("/reset-password", {
+        email,
+        newPassword,
+      });
 
-      setMessage("Email verified. Redirecting...");
-      setTimeout(() => {
-        navigate("/auth/change-password", { state: { email } });
-      }, 1500);
-
+      if (response.status === 200) {
+        setMessage("Password updated successfully! Redirecting to login...");
+        setTimeout(() => navigate("/auth/login"), 2000);
+      }
     } catch (error) {
-      // <-- This block now correctly handles the error from the backend
-      console.error("Forgot password error:", error);
-
-      // Check if the error is a 404 "Not Found" error from our API
+      console.error("Reset password error:", error);
       if (error.response && error.response.status === 404) {
-        setMessage(error.response.data.message || "This email is not registered."); // Use backend message
+        setMessage("This email is not registered.");
+      } else if (error.response && error.response.data && error.response.data.message) {
+        setMessage(error.response.data.message);
       } else {
-        // Handle other errors (like network issues)
         setMessage("An unexpected error occurred. Please try again.");
       }
-      
-      // Set a timeout to clear the error message
       setTimeout(() => setMessage(""), 3000);
-
     } finally {
       setLoading(false);
     }
@@ -59,34 +87,66 @@ const ForgotPassword = () => {
 
   return (
     <div className="flex h-screen w-full items-center justify-center mt-10">
-      <div className="max-w-md rounded-3xl p-8 py-12 shadow-2xl shadow-gray-600">
+      <div className="max-w-md rounded-3xl p-8 py-12 shadow-2xl shadow-gray-600 w-full">
         <div className="mb-8 w-full text-center">
           <h1 className="mb-1.5 text-center text-2xl font-bold">
-            Forgot Password
+            Reset Password
           </h1>
           <p className="text-sm text-gray-500">
-            Provide the email address associated with your account to recover
-            your password
+            Enter your email and new password to reset it directly.
           </p>
         </div>
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email" className="block">
+            <label htmlFor="email" className="block text-sm font-medium">
               Email
             </label>
             <input
               type="email"
               value={email}
-              name="email"
               id="email"
-              className="w-full rounded-md border border-gray-500 p-2"
+              className="w-full rounded-md border border-gray-500 p-2 mt-1"
               placeholder="xyz@gmail.com"
-              onChange={(event) => setEmail(event.target.value)}
-              onBlur={(event) => validateEmail(event.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
+              onBlur={(e) => validateEmail(e.target.value)}
             />
-            {emailError && (
-              <p className="text-red-500 text-sm">{emailError}</p>
+            {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
+          </div>
+
+          <div>
+            <label htmlFor="newPassword" className="block text-sm font-medium">
+              New Password
+            </label>
+            <input
+              type="password"
+              value={newPassword}
+              id="newPassword"
+              className="w-full rounded-md border border-gray-500 p-2 mt-1"
+              placeholder="Enter new password"
+              onChange={(e) => setNewPassword(e.target.value)}
+              onBlur={() => validatePassword(newPassword)}
+            />
+            {passwordError && (
+              <p className="text-red-500 text-sm">{passwordError}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="confirmNewPassword" className="block text-sm font-medium">
+              Confirm New Password
+            </label>
+            <input
+              type="password"
+              value={confirmNewPassword}
+              id="confirmNewPassword"
+              className="w-full rounded-md border border-gray-500 p-2 mt-1"
+              placeholder="Re-enter new password"
+              onChange={(e) => setConfirmNewPassword(e.target.value)}
+              onBlur={() => validateConfirmPassword(confirmNewPassword)}
+            />
+            {confirmPasswordError && (
+              <p className="text-red-500 text-sm">{confirmPasswordError}</p>
             )}
           </div>
 
@@ -96,23 +156,23 @@ const ForgotPassword = () => {
               disabled={loading}
               className="w-full rounded-lg bg-blue-600 p-3 font-bold text-white transition-all duration-200 hover:bg-blue-800 disabled:bg-gray-400"
             >
-              {loading ? "Verifying..." : "Reset Password"}
+              {loading ? "Updating..." : "Reset Password"}
             </button>
           </div>
         </form>
 
         {message && (
-          // Use different colors for success vs. error messages
-          <p className={`mt-4 text-center text-sm ${message.includes("Redirecting") ? "text-green-600" : "text-red-600"}`}>
+          <p
+            className={`mt-4 text-center text-sm font-medium ${
+              message.includes("successfully") ? "text-green-600" : "text-red-600"
+            }`}
+          >
             {message}
           </p>
         )}
 
         <div className="mt-6 text-center">
-          <Link
-            to="/auth/login"
-            className="text-indigo-600 hover:underline text-sm"
-          >
+          <Link to="/auth/login" className="text-indigo-600 hover:underline text-sm">
             Back to Login
           </Link>
         </div>
