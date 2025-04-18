@@ -68,7 +68,7 @@ const ForgotPassword = () => {
 
       if (response.status === 200) {
         setMessage("Password updated successfully! Redirecting to login...");
-        setTimeout(() => navigate("/auth/login"), 2000);
+        setTimeout(() => navigate("/login"), 2000);
       }
     } catch (error) {
       console.error("Reset password error:", error);
@@ -172,7 +172,7 @@ const ForgotPassword = () => {
         )}
 
         <div className="mt-6 text-center">
-          <Link to="/auth/login" className="text-indigo-600 hover:underline text-sm">
+          <Link to="/login" className="text-indigo-600 hover:underline text-sm">
             Back to Login
           </Link>
         </div>

@@ -15,6 +15,7 @@ import BmiCalculator from "./pages/BmiCalculator";
 import Workouts from "./pages/Workouts";
 import ExerciseLibrary from "./pages/ExerciseLibrary";
 import Settings from "./pages/Settings";
+import ForgotPassword from "./components/ForgotPassword";
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -53,6 +54,7 @@ const Layout = () => {
           <Route path="/" element={<PublicRoute><Home /></PublicRoute>} />
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+          <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
           <Route path="/about" element={<PublicRoute><About /></PublicRoute>} />
           
           {/* Public Routes (Always accessible) */}
