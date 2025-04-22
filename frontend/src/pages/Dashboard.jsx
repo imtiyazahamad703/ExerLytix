@@ -1,8 +1,42 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FiHome, FiUser, FiSettings, FiLogOut } from "react-icons/fi";
+import { useState } from "react";
+import axios from "axios";
+
 
 const Dashboard = () => {
+
+  const [output, setOutput] = useState("");
+  
+  const runPythonScript = async (exerciseType) => {
+    try {
+      const response = await fetch("http://localhost:5000/run-python", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ exercise_type: exerciseType }),
+      });
+
+      const data = await response.json();
+      setOutput(data.message || data.error);
+    } catch (error) {
+      setOutput("Error starting script");
+    }
+  };
+
+  const stopPythonScript = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/stop-python", {
+        method: "POST",
+      });
+
+      const data = await response.json();
+      setOutput(data.message || data.error);
+    } catch (error) {
+      setOutput("Error stopping script");
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gray-100 mt-21">
       {/* Sidebar */}
@@ -55,6 +89,39 @@ const Dashboard = () => {
             <p className="text-gray-600">Today: 1h 30m</p>
           </div>
         </div>
+
+        <div className="flex flex-col items-center gap-4 p-6">
+      <h1 className="text-2xl font-bold">Run Python from React</h1>
+      <div className="flex gap-4">
+        <button
+          onClick={() => runPythonScript("push-up")}
+          className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+        >
+          Start Push-Up
+        </button>
+        <button
+          onClick={() => runPythonScript("pull-up")}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Start Pull-Up
+        </button>
+        <button
+          onClick={() => runPythonScript("squat")}
+          className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition"
+        >
+          Start Squat
+        </button>
+        <button
+          onClick={stopPythonScript}
+          className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+        >
+          Stop Script
+        </button>
+      </div>
+      <p className="mt-4 text-lg font-medium">Output: {output}</p>
+    </div>
+
+
       </div>
     </div>
   );
