@@ -2,3 +2,13 @@ venv/
 __pycache__/
 *.pyc
 .env
+
+# Java/Maven
+target/
+*.class
+
+# Node/React
+node_modules/
+dist/
+build/
+.env.local
