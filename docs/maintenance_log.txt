@@ -1,0 +1,2 @@
+
+- Activity on 2025-05-10T11:15:00: docs: update README with future goals
