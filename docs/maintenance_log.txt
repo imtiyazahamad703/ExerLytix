@@ -27,3 +27,4 @@
 - Activity on 2025-05-10T11:15:00: docs: update README with future goals
 - Activity on 2025-05-10T16:45:00: chore: update dependencies in pom.xml
 - Activity on 2025-05-28T14:30:00: style: fix minor padding issues on Dashboard
+- Activity on 2025-06-15T10:20:00: refactor: clean up unused variables in BodyPartAngle.py
