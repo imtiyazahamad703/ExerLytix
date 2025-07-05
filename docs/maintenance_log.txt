@@ -4,3 +4,4 @@
 - Activity on 2025-05-28T14:30:00: style: fix minor padding issues on Dashboard
 - Activity on 2025-06-15T10:20:00: refactor: clean up unused variables in BodyPartAngle.py
 - Activity on 2025-06-15T18:10:00: fix: handle edge case in shoulder press angle calculation
+- Activity on 2025-07-05T09:55:00: docs: add comments to WebSocket config for clarity
