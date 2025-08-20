@@ -6,3 +6,4 @@
 - Activity on 2025-06-15T18:10:00: fix: handle edge case in shoulder press angle calculation
 - Activity on 2025-07-05T09:55:00: docs: add comments to WebSocket config for clarity
 - Activity on 2025-08-02T13:40:00: chore: format ExerciseController.java
+- Activity on 2025-08-20T11:05:00: fix: minor bug in JWT token parsing
