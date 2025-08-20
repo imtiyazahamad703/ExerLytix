@@ -31,6 +31,9 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
         if not ret:
             break
             
+        # Optimize processing speed by resizing frame
+        frame = cv2.resize(frame, (640, 480), interpolation=cv2.INTER_AREA)
+        
         # Convert frame to RGB for MediaPipe
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame_rgb.flags.writeable = False
