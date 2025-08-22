@@ -3,6 +3,8 @@ import Login from "../components/Login";
 import Register from "../components/Register";
 import ForgotPassword from "../components/ForgotPassword";
 import ChangePassword from "../components/ChangePassword";
+import Dashboard from "./Dashboard";
+import About from "./About";
 
 const Auth = () => {
   return (
@@ -13,6 +15,8 @@ const Auth = () => {
       <Route path="register" element={<Register />} />
       <Route path="forgot-password" element={<ForgotPassword />} />
       <Route path="change-password" element={<ChangePassword />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      
     </Routes>
   );
 };

@@ -49,5 +49,13 @@ def score_table(exercise, frame , counter, status):
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2, cv2.LINE_AA)
     cv2.putText(frame, "Status : " + str(status), (10, 135),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2, cv2.LINE_AA)
+
+    # try:
+    #     with open("exercise_counter.txt", "w") as f:
+    #         f.write(f"{counter}\n")
+    #     print(f"Written to file: {exercise} reps: {counter}")
+    # except Exception as e:
+    #     print(f"Error writing to file: {e}")
+
     return frame
-    
+

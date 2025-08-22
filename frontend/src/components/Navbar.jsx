@@ -18,7 +18,7 @@ const Navbar = () => {
         <div className="hidden md:flex space-x-8 text-lg">
           <Link to="/" className="hover:text-blue-400 transition">Home</Link>
           <Link to="/about" className="hover:text-blue-400 transition">About</Link>
-          <Link to="/workout" className="hover:text-blue-400 transition">Workouts</Link>
+          <Link to="/dashboard" className="hover:text-blue-400 transition">Workouts</Link>
           <Link to="/nutrition" className="hover:text-blue-400 transition">Nutrition</Link>
           <Link to="/contact" className="hover:text-blue-400 transition">Contact</Link>
         </div>
@@ -43,7 +43,7 @@ const Navbar = () => {
         <div className="md:hidden bg-gray-800">
           <ul className="flex flex-col items-center space-y-4 py-5">
             <li><Link to="/" className="hover:text-blue-400 transition">Home</Link></li>
-            <li><Link to="/workout" className="hover:text-blue-400 transition">Workouts</Link></li>
+            <li><Link to="/dashboard" className="hover:text-blue-400 transition">Workouts</Link></li>
             <li><Link to="/nutrition" className="hover:text-blue-400 transition">Nutrition</Link></li>
             <li><Link to="/contact" className="hover:text-blue-400 transition">Contact</Link></li>
             <li>
