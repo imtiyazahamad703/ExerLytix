@@ -8,5 +8,6 @@ import com.immutech.ExerLytix.entity.Member;
 @Repository
 public interface MemberRepository extends JpaRepository<Member,Integer> {
 	public Member findByEmail(String email);
+	boolean existsByEmail(String email);
 
 }

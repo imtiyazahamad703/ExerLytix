@@ -2,6 +2,7 @@ package com.immutech.ExerLytix.controller;
 
 import java.net.Authenticator;
 
+import com.immutech.ExerLytix.services.RegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,8 @@ public class MemberController {
 
 	@Autowired
 	private AuthenticationManager authManager;
+	@Autowired
+	private RegistrationService registrationService;
 	
 	@GetMapping("/")
 	public String testingFunc() {
@@ -42,12 +45,15 @@ public class MemberController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<String> register(@RequestBody Member member) {
-		String encodedPwd = passwordEncoder.encode(member.getPassword());
-		member.setPassword(encodedPwd);
-		repository.save(member);
-		return new ResponseEntity<>("Member Registered", HttpStatus.CREATED);
-		
+	public ResponseEntity<?> register(@RequestBody Member member) {
+		try {
+			Member saved = registrationService.register(member);
+			return ResponseEntity.ok(saved);
+		} catch (RuntimeException ex) {
+			return ResponseEntity
+					.status(HttpStatus.CONFLICT)
+					.body(ex.getMessage());
+		}
 	}
 
 	@PostMapping("/login")
