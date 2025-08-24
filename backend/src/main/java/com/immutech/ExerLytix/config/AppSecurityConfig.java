@@ -38,17 +38,17 @@ public class AppSecurityConfig {
 //	 provider) {
 //	 return new ProviderManager(provider);
 //	 }
-	 
-	@Bean
 
-	public SecurityFilterChain permitTheRequest(HttpSecurity http) throws Exception {
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
-		.cors()
-		.and()
-		.authorizeHttpRequests(
-				(req) -> req.requestMatchers("/api/", "/api/login", "/api/register").permitAll().anyRequest().authenticated()
+				.csrf(csrf -> csrf.disable()) // disable CSRF for APIs
+				.cors(cors -> cors.disable()) // disable CORS (enable later if frontend is on different domain)
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/api/", "/api/login", "/api/register").permitAll()
+						.anyRequest().authenticated()
 				)
-		.csrf().disable();
+				.authenticationProvider(authProvider());
 
 		return http.build();
 	}

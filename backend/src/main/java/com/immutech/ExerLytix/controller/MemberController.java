@@ -1,6 +1,7 @@
 package com.immutech.ExerLytix.controller;
 
 import java.net.Authenticator;
+import java.util.Map;
 
 import com.immutech.ExerLytix.services.RegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,19 +58,22 @@ public class MemberController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
+	public ResponseEntity<?> login(@RequestBody LoginDto loginDto){
 		UsernamePasswordAuthenticationToken token=new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
 		try {
-				Authentication authenticate=authManager.authenticate(token);
-				boolean status=authenticate.isAuthenticated();
-				if(status) {
-					return new ResponseEntity("Welcome to ExerLytix",HttpStatus.OK);
-				}				
-		}
-		catch(Exception e) {
+			Authentication authenticate = authManager.authenticate(token);
+
+			if (authenticate.isAuthenticated()) {
+				return ResponseEntity.ok(
+						Map.of("success", true, "message", "Login successful")
+				);
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
-		}		
-		
-		return new ResponseEntity<> ("Welcom to ExerLytix", HttpStatus.BAD_REQUEST);
+		}
+
+		// Default for invalid credentials
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(Map.of("success", false, "message", "Invalid email or password"));
 	}
 }

@@ -8,6 +8,8 @@ const Login = () => {
   const[password,setPassword]=useState("");
   const[remember,setRemember]=useState(false);
   const navigate = useNavigate(); // ✅ Navigation hook
+  const [errorMessage, setErrorMessage] = useState("");// to show login error
+
 
 
   const [isValid,setIsValid]=useState(false);
@@ -41,22 +43,27 @@ const Login = () => {
   const handleLogin= async (e)=>{
     e.preventDefault();
     const loginData={email,password}
-    try{
-      const response=await axiosInstance.post("/login",loginData);
-      console.log(response.data);
-      if (response.data.success) { // ✅ Check if login was successful
-        console.log("Login successful");
-        navigate("/dashboard"); // ✅ Redirect to welcome page
-      } else {
-        console.log("Invalid credentials");
-        navigate("/dashboard");
-      }
-    }
-    catch(error){
-      console.log("There is some error :",error);
-    }
+    try {
+    const response = await axiosInstance.post("/login", loginData);
+    console.log(response.data);
 
-  };
+    if (response.data.success) {
+      // Login successful
+      setErrorMessage("");           // Clear any previous errors
+      navigate("/dashboard");        // Redirect to dashboard
+    } else {
+      // Login failed (wrong email or password)
+      setErrorMessage(response.data.message);
+      setTimeout(() => setErrorMessage(""), 2000);
+
+    }
+  } catch (error) {
+    console.error("Login error:", error);
+      setErrorMessage("wrong email or password");
+      setTimeout(() => setErrorMessage(""), 2000);
+
+  }
+};
 
   return (
     <>
@@ -71,6 +78,9 @@ const Login = () => {
         <div className="md:w-1/2 sm:w-full lg:w-2/5 flex justify-center items-center mt-[5%] ">
           <div className="w-full bg-white m-3 sm:mx-10 flex flex-col rounded-xl  p-4 shadow-2xl shadow-gray-600">
             <h1 className="my-6 text-3xl font-black text-blue-800 text-center">Login Here</h1>
+            {errorMessage && (
+  <p className="text-red-600 text-center font-semibold mb-4">{errorMessage}</p>
+)}
             <form onSubmit={handleLogin}>
               <div className="">
                 <label htmlFor="email" className="block text-left text-gray-700">Email</label>
