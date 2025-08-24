@@ -5,6 +5,7 @@ import ForgotPassword from "../components/ForgotPassword";
 import ChangePassword from "../components/ChangePassword";
 import Dashboard from "./Dashboard";
 
+
 const Auth = () => {
   return (
     <Routes>
@@ -15,7 +16,6 @@ const Auth = () => {
       <Route path="forgot-password" element={<ForgotPassword />} />
       <Route path="change-password" element={<ChangePassword />} />
       <Route path="/dashboard" element={<Dashboard />} />
-
     </Routes>
   );
 };
