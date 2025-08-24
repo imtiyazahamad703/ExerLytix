@@ -28,6 +28,7 @@ An AI-powered fitness platform providing personalized workout & diet recommendat
   ## Backend
     jdk -21
     mysql db
+    Python 3.9+
    **Eclipse** : 
       file -> import -> import Existing maven project -> select till backend folder.
     Update Maven project :
@@ -36,14 +37,27 @@ An AI-powered fitness platform providing personalized workout & diet recommendat
   ### application.properties
     change username 
     change password
-    create db : 
-      copy & past : create database exerlytix;
+  ### Core Python Packages to run MediaPipe model using opencv
+    pip install opencv-python
+    pip install mediapipe
+    pip install numpy
+    pip install pandas
+    pip install Flask
+    pip install flask-cors
+
+  ## Frontend
+  ### NPM Packages to Install
+    npm install
+    npm install react react-dom
+    npm install react-router-dom
+    npm install react-icons
+    npm install axios
 
 # How to run Project :
-  **1st** run backend : ExerLytixApplication.java (inside :com.immutech.ExerLytix;) as application
+  **1st** run backend Java : ExerLytixApplication.java (inside :com.immutech.ExerLytix;) as application
+  **2nd** run backedn Python: server.py file using command--> python server.py
   **2nd** frontend terminal : npm run dev
   
- 
     
       
       
