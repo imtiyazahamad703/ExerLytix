@@ -21,8 +21,6 @@ class BodyPartAngle:
         r_wrist = detection_body_part(self.landmarks, "RIGHT_WRIST")
         return calculate_angle(r_shoulder, r_elbow, r_wrist)
 
-    
-
     def angle_of_the_left_leg(self):
         l_hip = detection_body_part(self.landmarks, "LEFT_HIP")
         l_knee = detection_body_part(self.landmarks, "LEFT_KNEE")
@@ -69,3 +67,4 @@ class BodyPartAngle:
         knee_avg = [(r_knee[0] + l_knee[0]) / 2, (r_knee[1] + l_knee[1]) / 2]
 
         return calculate_angle(shoulder_avg, hip_avg, knee_avg)
+    
