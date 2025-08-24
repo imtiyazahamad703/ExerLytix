@@ -55,9 +55,23 @@ const Register = () => {
     try{
       const response=await axiosInstance.post("/register",RegisterData)
       console.log(response.data);
+      // ✅ Show success message
+      setSuccessMessage("🎉 Registration successful!");
+      setErrorMessage("");
+
+      setName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+
+      setEmailError("");
+      setPasswordError("");
+      setConfirmPasswordError("");
     }
     catch(error){
       console.error(response.error);
+      setErrorMessage("❌ Registration failed. Please try again.");
+      setSuccessMessage("");
     }
   }
 

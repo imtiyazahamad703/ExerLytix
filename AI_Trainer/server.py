@@ -40,6 +40,16 @@ def stop_python():
             return jsonify({'message': 'No script running'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/api/exercise-count', methods=['GET'])
+def get_exercise_count():
+    try:
+        with open('exercise_counter.txt', 'r') as f:
+            count = int(f.read().strip())
+        return jsonify({"completed": count})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)  # Allow external access

@@ -5,6 +5,7 @@ import ForgotPassword from "../components/ForgotPassword";
 import ChangePassword from "../components/ChangePassword";
 import Dashboard from "./Dashboard";
 
+import About from "./About";
 
 const Auth = () => {
   return (

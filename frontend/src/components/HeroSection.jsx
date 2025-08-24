@@ -4,7 +4,9 @@ import fitnessImage from "../assets/banners/image.png";
 
 const HeroSection = () => {
   return (
-    <section className="flex flex-col md:flex-row w-screen h-screen items-center justify-between px-10 py-20 bg-gray-100">
+    <section className="flex flex-col md:flex-row w-screen h-screen items-center justify-around px-10 py-20 bg-gray-100">
+      
+      
       {/* Left Section - Text */}
       <div className="max-w-lg">
         <h1 className="text-4xl font-bold leading-tight text-pink-800">
