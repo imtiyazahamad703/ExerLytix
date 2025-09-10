@@ -22,8 +22,8 @@ function LiveDashboard() {
   }, []);
 
   return (
-    <div className="p-8 bg-slate-900 min-h-screen text-white">
-      <h1 className="text-3xl font-bold mb-8 text-blue-400">Live AI Training Stats</h1>
+    <div className="p-8 bg-gradient-to-br from-slate-900 to-slate-800 min-h-screen text-white">
+      <h1 className="text-3xl font-bold mb-8 text-blue-400">Live AI Training Stats <span className="animate-pulse inline-block h-3 w-3 bg-red-500 rounded-full ml-2"></span></h1>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl">
