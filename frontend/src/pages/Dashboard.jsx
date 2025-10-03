@@ -3,7 +3,14 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FiHome, FiUser, FiSettings, FiLogOut } from "react-icons/fi";
 import Navbar from "../components/Navbar";
+
+
 const Dashboard = () => {
+
+  const goToProfile = () => {
+    window.location.href = "http://localhost:8080/profile";
+  };
+
   const [output, setOutput] = useState("");
   const runPythonScript = async (exerciseType) => {
     try {
@@ -61,13 +68,14 @@ const Dashboard = () => {
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/profile"
-                  className="flex items-center space-x-2 p-3 rounded-lg hover:bg-blue-700 transition"
-                >
-                  <FiUser /> <span>Profile</span>
-                </Link>
-              </li>
+              <Link
+                to="/profile"
+                target="_self" // opens in same tab
+                className="flex items-center space-x-2 p-3 rounded-lg hover:bg-blue-700 transition"
+              >
+                <FiUser /> <span>Profile</span>
+              </Link>
+            </li>
               <li>
                 <Link
                   to="/settings"
