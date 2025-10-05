@@ -1,14 +1,20 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const { register, handleSubmit } = useForm();
+  const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     try {
       const response = await axios.post('http://localhost:8080/api/v1/member/login', data);
-      alert(response.data);
+      if (response.data === "Login Success") {
+        navigate('/dashboard');
+      } else {
+        alert(response.data);
+      }
     } catch (error) {
       console.error(error);
       alert("Login failed");
