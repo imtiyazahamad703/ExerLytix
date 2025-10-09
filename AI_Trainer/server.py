@@ -3,12 +3,26 @@ from flask_cors import CORS
 import subprocess
 import os
 import signal
+import sys
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS
 
 # 🔹 Store processes by exercise type
 processes = {}
+current_user_id = 1  # default
+
+@app.route('/set_user', methods=['POST'])
+def set_user():
+    global current_user_id
+    try:
+        data = request.get_json(force=True)
+        current_user_id = int(data.get('user_id', 1))  # fallback to 1
+        print(f"✅ Active user set to: {current_user_id}")
+        return jsonify({"message": "User ID set successfully", "user_id": current_user_id}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/run-python', methods=['POST'])
 def run_python():
@@ -27,17 +41,22 @@ def run_python():
                 pass
             processes[exercise_type] = None
 
-        # Start new process
+        #start new process by passing current_user_id to main
         proc = subprocess.Popen(
-            ['python', 'main.py', '-t', exercise_type],
+        [sys.executable, 'main.py', '-t', exercise_type, '-u', str(current_user_id)],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+         )
+
+        """# Start new process
+        proc = subprocess.Popen(
+            [sys.executable, 'main.py', '-t', exercise_type],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-        )
+        )"""
         processes[exercise_type] = proc
 
         return jsonify({'message': f'{exercise_type} started', 'pid': proc.pid})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/stop-python', methods=['POST'])
 def stop_python():
@@ -56,7 +75,6 @@ def stop_python():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @app.route('/api/exercise-count', methods=['GET'])
 def get_exercise_count():
     try:
@@ -65,7 +83,6 @@ def get_exercise_count():
         return jsonify({"completed": count})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.immutech.ExerLytix.dto.LoginDto;
 import com.immutech.ExerLytix.entity.Member;
 import com.immutech.ExerLytix.repo.MemberRepository;
+import org.springframework.web.client.RestTemplate;
 
 
 @RestController
@@ -39,6 +40,8 @@ public class MemberController {
 	private AuthenticationManager authManager;
 	@Autowired
 	private RegistrationService registrationService;
+
+	private final RestTemplate restTemplate = new RestTemplate();
 	
 	@GetMapping("/")
 	public String testingFunc() {
@@ -56,24 +59,36 @@ public class MemberController {
 					.body(ex.getMessage());
 		}
 	}
-
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody LoginDto loginDto){
-		UsernamePasswordAuthenticationToken token=new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
+		UsernamePasswordAuthenticationToken token =
+				new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
 		try {
 			Authentication authenticate = authManager.authenticate(token);
-
 			if (authenticate.isAuthenticated()) {
-				return ResponseEntity.ok(
-						Map.of("success", true, "message", "Login successful")
-				);
+
+				// 1️⃣ Fetch user_id from DB
+				Member member = repository.findByEmail(loginDto.getEmail());
+				if (member == null) {
+					throw new RuntimeException("User not found");
+				}
+				int userId = member.getId();
+
+				// 2️⃣ Send user_id to Python server
+				String pythonServerUrl = "http://localhost:5000/set_user";
+				Map<String, Integer> body = Map.of("user_id", userId);
+				restTemplate.postForObject(pythonServerUrl, body, String.class);
+
+				return ResponseEntity.ok(Map.of("success", true, "message", "Login successful"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		// Default for invalid credentials
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 				.body(Map.of("success", false, "message", "Invalid email or password"));
 	}
+
+
+
 }

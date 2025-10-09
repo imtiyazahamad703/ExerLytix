@@ -1,3 +1,5 @@
+from kafka_producer import send_exercise_data
+import time
 import cv2
 import argparse
 from utils import *
@@ -6,6 +8,10 @@ from body_part_angle import BodyPartAngle
 from types_of_excercise import TypeOfExercise
 
 
+
+# -------------------------------
+# Parse command-line arguments
+# -------------------------------
 ap = argparse.ArgumentParser()
 ap.add_argument("-t",
                 "--exercise_type",
@@ -15,16 +21,18 @@ ap.add_argument("-t",
 ap.add_argument("-vs",
                 "--video_source",
                 type=str,
-                help='Type of activity to do',
+                help='Video source (optional)',
                 required=False)
-args = vars(ap.parse_args())
-                
-                
+#access the use id from server.py comes from springboot
+ap.add_argument("-u", "--user_id", type=int, help="User ID", required=True)
+
 args = vars(ap.parse_args())
 
+# -------------------------------
+# Setup video capture
+# -------------------------------
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
-
 
 if args["video_source"] is not None:
     cap = cv2.VideoCapture("Exercise Videos/" + args["video_source"])
@@ -34,7 +42,18 @@ else:
 cap.set(3, 800)  # width
 cap.set(4, 480)  # height
 
-# setup mediapipe
+# -------------------------------
+# Initialize tracking variables
+# -------------------------------
+counter = 0
+status = True
+start_time = time.time()  # exercise start time
+last_publish = 0
+user_id = args["user_id"]#to set in kafka topic
+
+# -------------------------------
+# Mediapipe pose detection setup
+# -------------------------------
 with mp_pose.Pose(min_detection_confidence=0.5,
                   min_tracking_confidence=0.5) as pose:
 
@@ -42,7 +61,8 @@ with mp_pose.Pose(min_detection_confidence=0.5,
     status = True  # state of move
     while cap.isOpened():
         ret, frame = cap.read()
-        # result_screen = np.zeros((250, 400, 3), np.uint8)
+        if not ret:
+            break
 
         frame = cv2.resize(frame, (800, 480), interpolation=cv2.INTER_AREA)
         # recolor frame to RGB
@@ -54,13 +74,35 @@ with mp_pose.Pose(min_detection_confidence=0.5,
         frame.flags.writeable = True
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
+        # -------------------------------
+        # Exercise calculation
+        # -------------------------------
         try:
             landmarks = results.pose_landmarks.landmark
             counter, status = TypeOfExercise(landmarks).calculate_exercise(
                 args["exercise_type"], counter, status)
-        except:
+
+            # -------------------------------
+            # Kafka publishing (1 message/sec)
+            # -------------------------------
+            current_time = time.time()
+            if current_time - last_publish >= 1:  # publish every 1 second
+                elapsed_time = int(current_time - start_time)
+                send_exercise_data(
+                    user_id=user_id,
+                    exercise_type=args["exercise_type"],
+                    count=counter,
+                    elapsed_time=elapsed_time,
+                    start_time=int(start_time)
+                )
+                last_publish = current_time
+
+        except Exception as e:
             pass
 
+        # -------------------------------
+        # Display on frame
+        # -------------------------------
         frame = score_table(args["exercise_type"], frame, counter, status)
 
         # render detections (for landmarks)
@@ -80,5 +122,5 @@ with mp_pose.Pose(min_detection_confidence=0.5,
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
 
-    cap.release()
-    cv2.destroyAllWindows()
+cap.release()
+cv2.destroyAllWindows()

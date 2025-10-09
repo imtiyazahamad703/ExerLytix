@@ -3,9 +3,46 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FiHome, FiUser, FiSettings, FiLogOut } from "react-icons/fi";
 import Navbar from "../components/Navbar";
+import LineChart from "../Charts/LineChart";
+import DoughnutChart from "../Charts/DoughnutChart";
+import WorkoutHistoryTable from "../components/WorkoutHistoryTable";
 
 
 const Dashboard = () => {
+
+
+  // Calories burned over a week
+const caloriesData = {
+  labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  datasets: [
+    {
+      label: "Calories Burned",
+      data: [450, 500, 400, 600, 550, 700, 650],
+      borderColor: "rgba(75, 192, 192, 1)",
+      backgroundColor: "rgba(75, 192, 192, 0.2)",
+      tension: 0.3,
+    },
+  ],
+};
+
+// Exercise type distribution
+const exerciseDistribution = {
+  labels: ["Push-Up", "Squat", "Pull-Up", "Walk", "Sit-Up"],
+  datasets: [
+    {
+      label: "Exercises Completed",
+      data: [10, 15, 5, 20, 8],
+      backgroundColor: [
+        "#FF6384",
+        "#36A2EB",
+        "#FFCE56",
+        "#4BC0C0",
+        "#9966FF",
+      ],
+      borderWidth: 1,
+    },
+  ],
+};
 
   const goToProfile = () => {
     window.location.href = "http://localhost:8080/profile";
@@ -55,44 +92,6 @@ const Dashboard = () => {
       </div>
       <div className="flex flex-1 mt-24"> {/* increased top margin for gap */}
         {/* Sidebar */}
-        <div className="w-64 bg-blue-900 text-white flex flex-col p-6 h-screen sticky top-24">
-          <h2 className="text-3xl font-bold mb-8 text-center">Fitness Hub</h2>
-          <nav className="flex-1">
-            <ul className="space-y-4">
-              <li>
-                <Link
-                  to="/dashboard"
-                  className="flex items-center space-x-2 p-3 rounded-lg hover:bg-blue-700 transition"
-                >
-                  <FiHome /> <span>Home</span>
-                </Link>
-              </li>
-              <li>
-              <Link
-                to="/profile"
-                target="_self" // opens in same tab
-                className="flex items-center space-x-2 p-3 rounded-lg hover:bg-blue-700 transition"
-              >
-                <FiUser /> <span>Profile</span>
-              </Link>
-            </li>
-              <li>
-                <Link
-                  to="/settings"
-                  className="flex items-center space-x-2 p-3 rounded-lg hover:bg-blue-700 transition"
-                >
-                  <FiSettings /> <span>Settings</span>
-                </Link>
-              </li>
-            </ul>
-          </nav>
-          <button
-            className="flex items-center justify-center mt-8 space-x-2 p-3 rounded-lg bg-red-600 hover:bg-red-700 transition"
-            onClick={() => alert("Logging out...")}
-          >
-            <FiLogOut /> <span>Logout</span>
-          </button>
-        </div>
         {/* Main Content */}
         <div className="flex-1 flex flex-col p-6 pt-6 md:pt-0">
           {/* Stats Section */}
@@ -139,6 +138,22 @@ const Dashboard = () => {
               Stop All Scripts
             </button>
           </div>
+
+          <div className="mt-8 w-full">
+  <h2 className="text-2xl font-bold mb-4 text-gray-800">Performance Charts</h2>
+  <div className="flex flex-col md:flex-row gap-6">
+    <div className="flex-1 bg-white shadow-lg rounded-xl p-6 hover:scale-105 transition transform">
+      <LineChart data={caloriesData} title="Calories Burned" />
+    </div>
+
+    <div className="flex-1 bg-white shadow-lg rounded-xl p-6 hover:scale-105 transition transform">
+      <DoughnutChart data={exerciseDistribution} title="Exercise Distribution" />
+    </div>
+
+   
+  </div>
+</div>
+<WorkoutHistoryTable />
         </div>
       </div>
     </div>
