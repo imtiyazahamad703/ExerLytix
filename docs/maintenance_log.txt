@@ -39,3 +39,4 @@
 - Activity on 2025-10-15T10:15:00: feat: implement final analytics dashboard charts
 - Activity on 2025-10-15T14:40:00: feat: connect frontend workout history to backend WebSocket stream
 - Activity on 2025-10-15T21:10:00: fix: resolve CORS issues on production build
+- Activity on 2025-10-18T11:05:00: feat: add user profile picture upload functionality
