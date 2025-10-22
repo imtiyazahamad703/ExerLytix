@@ -44,3 +44,4 @@
 - Activity on 2025-10-18T19:45:00: style: polish mobile responsiveness on Nutrition page
 - Activity on 2025-10-22T09:30:00: feat: finalize AI trainer threshold calibration
 - Activity on 2025-10-22T13:15:00: test: add unit tests for MemberService
+- Activity on 2025-10-22T17:50:00: test: add integration tests for ExerciseLog persistence
