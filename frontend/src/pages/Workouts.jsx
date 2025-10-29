@@ -85,12 +85,17 @@ const Workouts = () => {
     }
   };
 
-  const formatDuration = (minutes) => {
-    if (!minutes) return "0m";
-    const hrs = Math.floor(minutes / 60);
-    const mins = Math.floor(minutes % 60);
-    if (hrs > 0) return `${hrs}h ${mins}m`;
-    else return `${mins}m`;
+  const formatDuration = (seconds) => {
+    if (!seconds) return "0s";
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    let result = "";
+    if (hrs > 0) result += `${hrs}h `;
+    if (mins > 0 || hrs > 0) result += `${mins}m `;
+    result += `${secs}s`;
+    return result.trim();
   };
 
   return (

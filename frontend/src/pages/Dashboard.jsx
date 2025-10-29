@@ -270,10 +270,10 @@ const Dashboard = () => {
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
             <div className="glass-card p-6 border-l-4 border-l-neon-blue">
-              <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Workouts Completed</h3>
+              <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Exercises Today</h3>
               <p className="text-3xl font-black text-slate-900 dark:text-white flex items-baseline">
-                {history.length}
-                <span className="ml-2 text-sm text-neon-blue font-medium">sessions</span>
+                {userLog?.totalExercisesCompleted || 0}
+                <span className="ml-2 text-sm text-neon-blue font-medium">completed</span>
               </p>
             </div>
             <div className="glass-card p-6 border-l-4 border-l-neon-purple">
