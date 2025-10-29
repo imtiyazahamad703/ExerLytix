@@ -86,10 +86,10 @@ public class MemberController {
 				}
 
 				int userId = member.getId();
-				// 2️⃣ Send user_id to Python server
-				String pythonServerUrl = "https://exerlytix-aimodel.onrender.com/set_user";
-				Map<String, Integer> body = Map.of("user_id", userId);
-				restTemplate.postForObject(pythonServerUrl, body, String.class);
+				// 2️⃣ Send user_id to Python server (MOVED TO FRONTEND)
+				// We no longer do this synchronously in the login API because if the Python
+				// server is asleep (Render free tier), it causes the entire login to fail.
+				// The frontend's Workouts.jsx already calls /set_user perfectly.
 
 				// ✅ Return all user details
 				return ResponseEntity.ok(Map.of(
