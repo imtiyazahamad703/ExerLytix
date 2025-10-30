@@ -6,6 +6,9 @@ import time
 import os
 import requests
 import threading
+import base64
+# pyrefly: ignore [missing-import]
+import numpy as np
 from types_of_excercise import TypeOfExercise
 from utils import score_table
 
@@ -71,9 +74,7 @@ def run_python():
             return jsonify({"error": "No active user set. Call /set_user first or pass user_id."}), 400
 
         with session_state['lock']:
-            if session_state['running']:
-                return jsonify({"error": "Tracker is already running"}), 400
-
+            # If already running, we just reset it to the new exercise instead of throwing 400 error.
             session_state['running'] = True
             session_state['exercise'] = exercise_type
             session_state['count'] = 0
@@ -81,10 +82,11 @@ def run_python():
             session_state['status'] = True
             session_state['start_time'] = time.time()
 
-        if cap is None or not cap.isOpened():
-            cap = cv2.VideoCapture(0)
-            cap.set(3, 1280)
-            cap.set(4, 720)
+        # --- OLD LOCALHOST LOGIC (COMMENTED OUT) ---
+        # if cap is None or not cap.isOpened():
+        #     cap = cv2.VideoCapture(0)
+        #     cap.set(3, 1280)
+        #     cap.set(4, 720)
             
         if pose_estimator is None:
             mp_pose = mp.solutions.pose
@@ -162,6 +164,98 @@ def generate_frames():
 def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+@app.route('/process_frame', methods=['POST'])
+def process_frame():
+    global pose_estimator
+    try:
+        data = request.json
+        image_data = data.get('image')
+        
+        with session_state['lock']:
+            running = session_state['running']
+            exercise_type = session_state['exercise']
+            current_count = session_state['count']
+            current_status = session_state['status']
+            
+        if not running or not image_data:
+            return jsonify({'error': 'Not running or no image'}), 400
+            
+        # Strip base64 header if present
+        if "," in image_data:
+            image_data = image_data.split(",")[1]
+            
+        img_bytes = base64.b64decode(image_data)
+        np_arr = np.frombuffer(img_bytes, np.uint8)
+        frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+        
+        # Mediapipe pose processing is not thread-safe. We MUST lock it.
+        with session_state['lock']:
+            if pose_estimator is None:
+                mp_pose = mp.solutions.pose
+                pose_estimator = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
+                
+            mp_drawing = mp.solutions.drawing_utils
+            mp_pose = mp.solutions.pose
+            
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frame_rgb.flags.writeable = False
+            results = pose_estimator.process(frame_rgb)
+            frame_rgb.flags.writeable = True
+            
+            new_count = current_count
+            new_status = current_status
+            
+            if results.pose_landmarks:
+                try:
+                    landmarks = results.pose_landmarks.landmark
+                    from types_of_excercise import TypeOfExercise
+                    exercise = TypeOfExercise(landmarks)
+                    new_count, new_status = exercise.calculate_exercise(exercise_type, current_count, current_status)
+                    
+                    mp_drawing.draw_landmarks(
+                        frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
+                        mp_drawing.DrawingSpec(color=(255, 255, 255), thickness=2, circle_radius=2),
+                        mp_drawing.DrawingSpec(color=(174, 139, 45), thickness=2, circle_radius=2)
+                    )
+                except Exception as e:
+                    pass
+                    
+            # Update state
+            session_state['count'] = new_count
+            session_state['status'] = new_status
+            mult = CALORIE_MULTIPLIERS.get(exercise_type, 0.5)
+            session_state['calories'] = round(new_count * mult, 2)
+            
+            # calculate duration
+            duration = 0
+            if session_state['start_time']:
+                duration = round(time.time() - session_state['start_time'], 2)
+                
+            return_stats = {
+                "count": new_count,
+                "calories": session_state['calories'],
+                "duration": duration,
+                "running": True
+            }
+            
+        # Draw score table (COMMENTED OUT AS REACT UI HANDLES THIS)
+        # from utils import score_table
+        # frame = score_table(exercise_type, frame, new_count, new_status)
+        
+        # Encode back to base64
+        ret, buffer = cv2.imencode('.jpg', frame)
+        processed_base64 = base64.b64encode(buffer).decode('utf-8')
+        
+        return jsonify({
+            'image': 'data:image/jpeg;base64,' + processed_base64,
+            'stats': return_stats
+        })
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/exercise-stats', methods=['GET'])
 def get_stats():
     with session_state['lock']:
@@ -214,7 +308,7 @@ def stop_python():
 
         try:
             backend_url = os.environ.get("JAVA_BACKEND_URL", "http://localhost:8081")
-            requests.post(f"{backend_url}/api/exercise/update", json=payload, timeout=5)
+            requests.post(f"{backend_url}/api/exercise/update", json=payload, timeout=15)
             print("✅ Data sent successfully to backend!")
         except Exception as e:
             print(f"❌ Backend update failed: {e}")

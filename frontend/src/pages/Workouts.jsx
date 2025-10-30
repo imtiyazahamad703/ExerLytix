@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { useAuth } from "../context/AuthContext";
@@ -9,6 +9,12 @@ const Workouts = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [stats, setStats] = useState({ count: 0, calories: 0, duration: 0 });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [processedFrame, setProcessedFrame] = useState(null);
+  const requestRef = useRef(null);
+  const [activeExerciseName, setActiveExerciseName] = useState("");
 
   const exercises = [
     { name: "Push-Up", key: "push-up", color: "from-blue-500 to-cyan-400" },
@@ -21,7 +27,8 @@ const Workouts = () => {
     { name: "Shoulder Press", key: "shoulder-press", color: "from-cyan-500 to-blue-500" },
   ];
 
-  // Poll for stats when running
+  // --- OLD LOCALHOST LOGIC (COMMENTED OUT) ---
+  /*
   useEffect(() => {
     let interval;
     if (isRunning) {
@@ -43,9 +50,98 @@ const Workouts = () => {
     }
     return () => clearInterval(interval);
   }, [isRunning]);
+  */
+
+  // --- NEW CLOUD ARCHITECTURE LOGIC ---
+  const sendFrameLoop = async () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    
+    if (video && canvas && video.readyState >= 2) {
+      const ctx = canvas.getContext("2d");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const base64Image = canvas.toDataURL("image/jpeg", 0.5); // 0.5 quality for speed
+      
+      try {
+        const response = await fetch(`${import.meta.env.VITE_PYTHON_API_URL || 'https://exerlytix-ai-tracker.onrender.com'}/process_frame`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: base64Image })
+        });
+        const data = await response.json();
+        
+        if (!response.ok) {
+          console.error("Server error:", data.error);
+          if (response.status === 400) {
+            // The server might have restarted, losing session state. Stop the loop.
+            stopCamera();
+            setIsRunning(false);
+            setOutput("Session lost (Server restarted). Please click Start again.");
+            return;
+          }
+        }
+        
+        if (data.image) setProcessedFrame(data.image);
+        if (data.stats) {
+          setStats({
+            count: data.stats.count || 0,
+            calories: data.stats.calories || 0,
+            duration: data.stats.duration || 0,
+          });
+        }
+      } catch(e) {
+        // Silently catch network errors so loop continues
+      }
+    }
+    
+    // Run at approx 6 FPS to prevent server overload
+    requestRef.current = setTimeout(sendFrameLoop, 150);
+  };
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          width: { ideal: 1280 }, 
+          height: { ideal: 720 },
+          facingMode: "user"
+        } 
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+      sendFrameLoop(); // Start the loop
+    } catch (err) {
+      setOutput("Camera permission denied or camera not found.");
+      setIsRunning(false);
+    }
+  };
+
+  const stopCamera = () => {
+    if (requestRef.current) clearTimeout(requestRef.current);
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = videoRef.current.srcObject.getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+  };
+
+  useEffect(() => {
+    if (isRunning) {
+      startCamera();
+    } else {
+      stopCamera();
+    }
+    return () => stopCamera();
+  }, [isRunning]);
 
   const runPythonScript = async (exerciseType) => {
     try {
+      const ex = exercises.find(e => e.key === exerciseType);
+      setActiveExerciseName(ex ? ex.name : exerciseType);
       setIsRunning(true);
       setOutput(`Initializing ${exerciseType} tracker...`);
       setStats({ count: 0, calories: 0, duration: 0 });
@@ -100,14 +196,14 @@ const Workouts = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
-      <div className="flex flex-1">
+      <div className={`flex flex-1 ${isRunning ? 'h-screen overflow-hidden' : ''}`}>
         {/* Sidebar */}
         <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
         
         {/* Main Content */}
-        <div className="flex-1 px-4 sm:px-6 lg:px-10 pt-20 pb-8 max-w-7xl mx-auto w-full relative z-10">
+        <div className={`flex-1 px-4 sm:px-6 lg:px-10 ${isRunning ? 'pt-6 pb-2' : 'pt-20 pb-8'} max-w-[1400px] mx-auto w-full relative z-10 flex flex-col h-full`}>
           
-          <div className="mb-8 flex justify-between items-center">
+          <div className="mb-4 flex justify-between items-center shrink-0">
             <div>
               <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-wide">
                 AI <span className="gradient-text">Tracker</span>
@@ -127,11 +223,16 @@ const Workouts = () => {
 
           {/* AI Tracker Console (Large Video Feed) */}
           {isRunning && (
-            <div className="mb-12 glass-card p-6 md:p-8 border border-neon-blue shadow-[0_0_20px_rgba(0,240,255,0.2)]">
-              <div className="flex justify-between items-center mb-8">
+            <div className="glass-card p-4 border border-neon-blue shadow-[0_0_20px_rgba(0,240,255,0.2)] flex flex-col w-full" style={{ height: '82vh', maxHeight: '850px' }}>
+              <div className="flex justify-between items-center mb-3 shrink-0">
                 <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white flex items-center">
                   <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse mr-3 shadow-[0_0_10px_rgba(16,185,129,0.8)]"></span>
                   Active Session
+                  {activeExerciseName && (
+                    <span className="ml-4 px-3 py-1 bg-slate-800 text-neon-blue rounded-lg text-sm uppercase tracking-wider border border-slate-700">
+                      {activeExerciseName}
+                    </span>
+                  )}
                 </h3>
                 <button
                   onClick={stopPythonScript}
@@ -141,15 +242,34 @@ const Workouts = () => {
                 </button>
               </div>
 
-              <div className="flex flex-col lg:flex-row gap-8">
+              <div className="flex flex-col lg:flex-row gap-4 flex-1 min-h-0">
                 {/* Video Feed */}
-                <div className="lg:w-3/4 bg-black rounded-xl overflow-hidden border-2 border-slate-700/50 relative self-start">
+                <div className="lg:w-4/5 bg-black rounded-xl overflow-hidden border-2 border-slate-700/50 relative flex justify-center items-center h-full">
+                  
+                  {/* --- NEW CLOUD ARCHITECTURE ELEMENTS --- */}
+                  <video ref={videoRef} style={{ position: 'absolute', width: 0, height: 0, opacity: 0 }} playsInline muted />
+                  <canvas ref={canvasRef} style={{ display: 'none' }} />
+                  
+                  {processedFrame ? (
+                    <img
+                      src={processedFrame}
+                      alt="AI Tracker Feed"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <p className="text-slate-400">Loading AI feed...</p>
+                  )}
+
+                  {/* --- OLD LOCALHOST LOGIC (COMMENTED OUT) --- */}
+                  {/*
                   <img
                     src={`${import.meta.env.VITE_PYTHON_API_URL || 'https://exerlytix-ai-tracker.onrender.com'}/video_feed`}
                     alt="AI Tracker Feed"
                     className="w-full h-auto object-contain max-h-[800px]"
                     onError={(e) => { e.target.src = ''; setOutput('Camera feed not available'); }}
                   />
+                  */}
+                  
                   {!isRunning && (
                     <div className="absolute inset-0 flex items-center justify-center bg-slate-900/80">
                       <p className="text-slate-400">Camera offline</p>
@@ -158,18 +278,18 @@ const Workouts = () => {
                 </div>
 
                 {/* Real-time Stats */}
-                <div className="lg:w-1/4 flex flex-col gap-6">
-                  <div className="bg-slate-800/50 rounded-xl p-6 lg:p-8 border border-slate-700 h-full flex flex-col justify-center items-center text-center">
-                    <p className="text-sm text-slate-400 uppercase tracking-wider mb-2">Rep Count</p>
-                    <p className="text-6xl lg:text-7xl font-extrabold text-neon-blue drop-shadow-[0_0_10px_rgba(0,240,255,0.8)]">{stats.count}</p>
+                <div className="lg:w-1/5 flex flex-col gap-3 h-full">
+                  <div className="bg-slate-800/50 rounded-xl p-2 border border-slate-700 flex-1 flex flex-col justify-center items-center text-center">
+                    <p className="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider mb-1">Rep Count</p>
+                    <p className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neon-blue drop-shadow-[0_0_10px_rgba(0,240,255,0.8)]">{stats.count}</p>
                   </div>
-                  <div className="bg-slate-800/50 rounded-xl p-6 lg:p-8 border border-slate-700 h-full flex flex-col justify-center items-center text-center">
-                    <p className="text-sm text-slate-400 uppercase tracking-wider mb-2">Calories</p>
-                    <p className="text-4xl lg:text-5xl font-extrabold text-neon-purple drop-shadow-[0_0_10px_rgba(176,38,255,0.8)]">{stats.calories} <span className="text-xl lg:text-2xl text-slate-500">kcal</span></p>
+                  <div className="bg-slate-800/50 rounded-xl p-2 border border-slate-700 flex-1 flex flex-col justify-center items-center text-center">
+                    <p className="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider mb-1">Calories</p>
+                    <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-neon-purple drop-shadow-[0_0_10px_rgba(176,38,255,0.8)]">{stats.calories} <span className="text-sm text-slate-500">kcal</span></p>
                   </div>
-                  <div className="bg-slate-800/50 rounded-xl p-6 lg:p-8 border border-slate-700 h-full flex flex-col justify-center items-center text-center">
-                    <p className="text-sm text-slate-400 uppercase tracking-wider mb-2">Duration</p>
-                    <p className="text-5xl font-extrabold text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">{formatDuration(stats.duration)}</p>
+                  <div className="bg-slate-800/50 rounded-xl p-2 border border-slate-700 flex-1 flex flex-col justify-center items-center text-center">
+                    <p className="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider mb-1">Duration</p>
+                    <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">{formatDuration(stats.duration)}</p>
                   </div>
                 </div>
               </div>
