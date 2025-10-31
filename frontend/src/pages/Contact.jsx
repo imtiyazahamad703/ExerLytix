@@ -1,6 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
+import emailjs from '@emailjs/browser';
 
 const Contact = () => {
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    emailjs.send(
+      "service_guw7w5b",
+      "template_d7d00bo",
+      {
+        user_name: formData.name,
+        user_email: formData.email,
+        subject: "Message from ExerLytix",
+        message: formData.message,
+      },
+      "cDpAN3cTIyHo04PwZ"
+    ).then(() => {
+      setIsSubmitted(true);
+      setFormData({ name: '', email: '', message: '' });
+      setTimeout(() => setIsSubmitted(false), 3000);
+    }).catch((error) => console.error("EmailJS Error:", error));
+  };
+
   return (
     <div className="w-full bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-slate-200 pt-32 pb-20 transition-colors duration-300">
       
@@ -49,15 +72,23 @@ const Contact = () => {
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 transition-colors">
               Send Us a Message
             </h2>
-            <form className="space-y-5">
+            {isSubmitted && (
+              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+                Thank you! Your message has been sent.
+              </div>
+            )}
+            <form className="space-y-5" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1 transition-colors">
                   Your Name
                 </label>
                 <input
                   type="text"
+                  required
                   placeholder="Enter your name"
                   className="input-field"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               </div>
               <div>
@@ -66,8 +97,11 @@ const Contact = () => {
                 </label>
                 <input
                   type="email"
+                  required
                   placeholder="Enter your email"
                   className="input-field"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
               </div>
               <div>
@@ -75,9 +109,12 @@ const Contact = () => {
                   Message
                 </label>
                 <textarea
+                  required
                   placeholder="Write your message..."
                   rows="4"
                   className="input-field"
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 ></textarea>
               </div>
               <button
